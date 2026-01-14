@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
 from swarm.agents.base import AgentContext, BaseAgent
@@ -20,6 +21,12 @@ class CoderAgent(BaseAgent):
         research = context.short_term.get(context.run_id, "researcher", "research") or ""
         deliverable = context.short_term.get(context.run_id, "researcher", "deliverable")
         needs = context.short_term.get(context.run_id, "researcher", "needs") or []
+        handoff = _read_json(context, context.output_dir / "handoff.json")
+        plan = _read_text(context, context.output_dir / "plan.json")
+        if handoff:
+            research = handoff.get("summary") or research
+            deliverable = handoff.get("deliverable") or deliverable
+            needs = handoff.get("needs") or needs
         if deliverable is None:
             prompt = "\n".join(
                 [
@@ -27,6 +34,7 @@ class CoderAgent(BaseAgent):
                     "Return JSON with fields: deliverable, subject, project_type.",
                     f"Objective: {context.objective}",
                     f"Research: {research}",
+                    f"Plan: {plan}",
                 ]
             )
             response_text = await self.complete(context, prompt)
@@ -88,6 +96,8 @@ def _build_project_files(
 ) -> dict[str, str | bytes]:
     if deliverable == "gif" or project_type == "animation":
         return _animation_project(objective, task, research, subject)
+    if deliverable == "python" or project_type == "python":
+        return _python_game_project(objective, task, research)
     return _landing_page_project(objective, task, research)
 
 
@@ -325,6 +335,86 @@ def _title_from_objective(objective: str) -> str:
     if not cleaned:
         return "Swarm Project"
     return cleaned[:60]
+
+
+def _python_game_project(objective: str, task: str, research: str) -> dict[str, str | bytes]:
+    return {
+        "main.py": """import random
+import time
+
+
+def render(board_width: int, board_height: int, snake: list[tuple[int, int]], food: tuple[int, int]) -> None:
+    print("\\033[2J\\033[H", end="")
+    for y in range(board_height):
+        row = []
+        for x in range(board_width):
+            if (x, y) == food:
+                row.append("*")
+            elif (x, y) == snake[0]:
+                row.append("O")
+            elif (x, y) in snake:
+                row.append("o")
+            else:
+                row.append(".")
+        print("".join(row))
+
+
+def place_food(board_width: int, board_height: int, snake: list[tuple[int, int]]) -> tuple[int, int]:
+    while True:
+        spot = (random.randint(0, board_width - 1), random.randint(0, board_height - 1))
+        if spot not in snake:
+            return spot
+
+
+def run() -> None:
+    board_width = 24
+    board_height = 12
+    snake = [(5, 5), (4, 5), (3, 5)]
+    direction = (1, 0)
+    food = place_food(board_width, board_height, snake)
+
+    while True:
+        head_x, head_y = snake[0]
+        dx, dy = direction
+        new_head = (head_x + dx, head_y + dy)
+        if (
+            new_head[0] < 0
+            or new_head[0] >= board_width
+            or new_head[1] < 0
+            or new_head[1] >= board_height
+            or new_head in snake
+        ):
+            print("Game over.")
+            break
+        snake.insert(0, new_head)
+        if new_head == food:
+            food = place_food(board_width, board_height, snake)
+        else:
+            snake.pop()
+
+        render(board_width, board_height, snake, food)
+        time.sleep(0.2)
+
+
+if __name__ == "__main__":
+    run()
+""",
+        "README.md": _readme_text(objective, task, research),
+    }
+
+
+def _read_text(context: AgentContext, path: Path) -> str:
+    try:
+        return context.filesystem.read_text(path)
+    except Exception:
+        return ""
+
+
+def _read_json(context: AgentContext, path: Path) -> dict[str, Any]:
+    try:
+        return json.loads(context.filesystem.read_text(path))
+    except Exception:
+        return {}
 
 
 def _generate_scene_gif(subject: str, width: int, height: int, frames: int) -> bytes:

@@ -27,6 +27,7 @@ class CriticAgent(BaseAgent):
             output = {}
 
         files = output.get("files", [])
+        deliverable = output.get("deliverable")
         prompt = "\n".join(
             [
                 "ROLE: Critic",
@@ -48,13 +49,17 @@ class CriticAgent(BaseAgent):
         has_gif = any(name.endswith(".gif") for name in lower_files)
         has_video = any(name.endswith(".mp4") or name.endswith(".webm") for name in lower_files)
         has_html = any(name.endswith(".html") for name in lower_files)
+        has_python = any(name.endswith(".py") for name in lower_files)
         if not files:
             approved = False
             notes = "No files were produced; generate a project with concrete outputs."
-        elif not (has_gif or has_video or has_html):
+        elif not (has_gif or has_video or has_html or has_python):
             approved = False
             notes = "Missing primary deliverable; include a GIF/video or HTML entrypoint."
-        elif not (has_gif or has_video) and "index.html" not in lower_files:
+        elif deliverable == "python" and not has_python:
+            approved = False
+            notes = "Missing .py deliverable; include a runnable Python file."
+        elif not (has_gif or has_video or has_python) and "index.html" not in lower_files:
             approved = False
             notes = "Missing index.html; include a primary entrypoint."
 
