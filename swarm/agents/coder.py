@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+import json
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Any
 
 from swarm.agents.base import AgentContext, BaseAgent
@@ -18,8 +18,35 @@ class CoderAgent(BaseAgent):
     async def run(self, task: str, context: AgentContext) -> dict[str, Any]:
         self.log(context, f"Coding task: {task}")
         research = context.short_term.get(context.run_id, "researcher", "research") or ""
-        deliverable = _determine_deliverable(context.objective, research)
-        files = _build_project_files(context.objective, task, research, deliverable)
+        deliverable = context.short_term.get(context.run_id, "researcher", "deliverable")
+        needs = context.short_term.get(context.run_id, "researcher", "needs") or []
+        if deliverable is None:
+            prompt = "\n".join(
+                [
+                    "ROLE: Coder",
+                    "Return JSON with fields: deliverable, subject, project_type.",
+                    f"Objective: {context.objective}",
+                    f"Research: {research}",
+                ]
+            )
+            response_text = await self.complete(context, prompt)
+            try:
+                payload = json.loads(response_text)
+                deliverable = payload.get("deliverable")
+                subject = payload.get("subject") or context.objective
+                project_type = payload.get("project_type")
+            except json.JSONDecodeError:
+                deliverable = None
+                subject = context.objective
+                project_type = None
+        else:
+            subject = context.objective
+            project_type = None
+
+        deliverable = deliverable or _determine_deliverable(research)
+        files = _build_project_files(
+            context.objective, task, research, deliverable, subject=subject, project_type=project_type
+        )
         artifact_dir = context.output_dir
         if not context.dry_run:
             for name, file_content in files.items():
@@ -42,14 +69,25 @@ class CoderAgent(BaseAgent):
             }
         context.short_term.put(context.run_id, self.name, "artifact", str(artifact_dir))
         summary = "\n".join([f"{name}" for name in files.keys()])
-        return {"artifact": str(artifact_dir), "files": list(files.keys()), "content": summary}
+        return {
+            "artifact": str(artifact_dir),
+            "files": list(files.keys()),
+            "content": summary,
+            "needs": needs,
+            "deliverable": deliverable,
+        }
 
 
 def _build_project_files(
-    objective: str, task: str, research: str, deliverable: str
+    objective: str,
+    task: str,
+    research: str,
+    deliverable: str,
+    subject: str,
+    project_type: str | None,
 ) -> dict[str, str | bytes]:
-    if deliverable == "gif":
-        return _animation_project(objective, task, research)
+    if deliverable == "gif" or project_type == "animation":
+        return _animation_project(objective, task, research, subject)
     return _landing_page_project(objective, task, research)
 
 
@@ -188,9 +226,11 @@ button {
     }
 
 
-def _animation_project(objective: str, task: str, research: str) -> dict[str, str | bytes]:
+def _animation_project(
+    objective: str, task: str, research: str, subject: str
+) -> dict[str, str | bytes]:
     title = _title_from_objective(objective)
-    gif_bytes = _generate_scene_gif(objective, width=180, height=260, frames=48)
+    gif_bytes = _generate_scene_gif(subject, width=180, height=260, frames=48)
     return {
         "index.html": f"""<!doctype html>
 <html lang="en">
@@ -287,7 +327,7 @@ def _title_from_objective(objective: str) -> str:
     return cleaned[:60]
 
 
-def _generate_scene_gif(objective: str, width: int, height: int, frames: int) -> bytes:
+def _generate_scene_gif(subject: str, width: int, height: int, frames: int) -> bytes:
     palette = [
         (0, 0, 0),
         (224, 228, 248),
@@ -296,7 +336,7 @@ def _generate_scene_gif(objective: str, width: int, height: int, frames: int) ->
         (34, 197, 94),
     ]
     frame_data: list[list[int]] = []
-    lowered = objective.lower()
+    lowered = subject.lower()
     is_dino = "dinosaur" in lowered or "dino" in lowered
     for index in range(frames):
         pixels = [0] * (width * height)
@@ -521,12 +561,10 @@ def _next_power_of_two(value: int) -> int:
     return power
 
 
-def _determine_deliverable(objective: str, research: str) -> str:
-    combined = f"{objective}\n{research}".lower()
+def _determine_deliverable(research: str) -> str:
+    combined = f"{research}".lower()
     if "deliverable:" in combined and "gif" in combined:
         return "gif"
     if "gif encoder" in combined or "animated gif" in combined:
-        return "gif"
-    if "movie" in combined or "animation" in combined:
         return "gif"
     return "html"

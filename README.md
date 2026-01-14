@@ -16,6 +16,12 @@ python -m swarm "my objective" --run-id demo --max-steps 3 --dry-run --verbose -
 
 Outputs are written to `output/<slug>` by default (or `-o/--output-dir`) and run metadata is stored in `swarm.db`.
 
+## Using Ollama
+
+```bash
+python -m swarm "build me a 5 stage rocket animation" --llm-provider ollama --ollama-model llama3.1
+```
+
 ## Adding a new agent
 
 1. Create a new agent in `swarm/agents/` that subclasses `BaseAgent` and implements `async run()`.

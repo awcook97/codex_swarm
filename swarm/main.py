@@ -16,6 +16,16 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
     parser.add_argument("--max-steps", type=int, default=None, help="Maximum steps to execute")
     parser.add_argument("--dry-run", action="store_true", help="Plan and log without writing files")
+    parser.add_argument(
+        "--llm-provider",
+        type=str,
+        default=None,
+        choices=["mock", "ollama"],
+        help="LLM provider to use",
+    )
+    parser.add_argument("--ollama-model", type=str, default=None, help="Ollama model name")
+    parser.add_argument("--ollama-url", type=str, default=None, help="Ollama generate URL")
+    parser.add_argument("--enable-http", action="store_true", help="Enable HTTP for research")
     return parser
 
 
@@ -25,6 +35,14 @@ def main() -> int:
 
     repo_root = Path(__file__).resolve().parents[1]
     config = SwarmConfig.from_repo_root(repo_root)
+    if args.llm_provider:
+        config.llm_provider = args.llm_provider
+    if args.ollama_model:
+        config.ollama_model = args.ollama_model
+    if args.ollama_url:
+        config.ollama_url = args.ollama_url
+    if args.enable_http:
+        config.enable_http = True
     coordinator = Coordinator(config=config)
 
     result = asyncio.run(

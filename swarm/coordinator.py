@@ -20,7 +20,7 @@ from swarm.agents import (
 from swarm.agents.instructions import load_agent_instructions
 from swarm.bus import EventLog
 from swarm.config import SwarmConfig
-from swarm.llm import LLM, MockLLM
+from swarm.llm import LLM, MockLLM, OllamaLLM
 from swarm.memory import PersistentMemory, ShortTermMemory
 from swarm.tools import FilesystemTool, HttpTool, ShellTool
 
@@ -43,7 +43,7 @@ class Coordinator:
         self.filesystem = FilesystemTool(list(config.filesystem_allowlist))
         self.shell = ShellTool(list(config.shell_allowlist))
         self.http = HttpTool()
-        self.llm = llm or MockLLM(seed=config.seed)
+        self.llm = llm or self._build_llm()
         self.agents: dict[str, BaseAgent] = {
             "researcher": ResearcherAgent(
                 instructions=load_agent_instructions(self.config.repo_root, "researcher")
@@ -58,6 +58,11 @@ class Coordinator:
                 instructions=load_agent_instructions(self.config.repo_root, "critic")
             ),
         }
+
+    def _build_llm(self) -> LLM:
+        if self.config.llm_provider == "ollama":
+            return OllamaLLM(model=self.config.ollama_model, url=self.config.ollama_url)
+        return MockLLM(seed=self.config.seed)
 
     def _context(
         self, run_id: str, objective: str, output_dir: Path, dry_run: bool, verbose: bool
@@ -103,6 +108,7 @@ class Coordinator:
         steps = plan.get("steps", [])
         limit = max_steps or self.config.max_steps
         steps = steps[:limit]
+        steps = [step for step in steps if step.get("agent") != "critic"]
         pending = {step["id"]: step for step in steps}
         completed: dict[int, StepResult] = {}
 

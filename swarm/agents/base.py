@@ -42,3 +42,15 @@ class BaseAgent:
             "agent_message",
             {"agent": self.name, "role": self.role, "message": message},
         )
+
+    async def complete(self, context: AgentContext, prompt: str) -> str:
+        context.event_log.log(
+            "llm_prompt",
+            {"agent": self.name, "role": self.role, "prompt": prompt},
+        )
+        response = await context.llm.complete(prompt)
+        context.event_log.log(
+            "llm_response",
+            {"agent": self.name, "role": self.role, "response": response.content},
+        )
+        return response.content

@@ -16,9 +16,16 @@ class PlannerAgent(BaseAgent):
 
     async def run(self, task: str, context: AgentContext) -> dict[str, Any]:
         self.log(context, f"Planning for objective: {task}")
-        response = await context.llm.complete(task)
+        prompt = "\n".join(
+            [
+                "ROLE: Planner",
+                "Return JSON with a plan of steps (id, agent, task, depends_on).",
+                f"Objective: {task}",
+            ]
+        )
+        response = await self.complete(context, prompt)
         try:
-            plan = json.loads(response.content)
+            plan = json.loads(response)
         except json.JSONDecodeError:
             plan = {
                 "steps": [

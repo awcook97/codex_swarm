@@ -27,6 +27,23 @@ class CriticAgent(BaseAgent):
             output = {}
 
         files = output.get("files", [])
+        prompt = "\n".join(
+            [
+                "ROLE: Critic",
+                "Return JSON with fields: approved, notes.",
+                f"Objective: {context.objective}",
+                f"Files: {files}",
+                f"Output summary: {output.get('content', '')}",
+            ]
+        )
+        response_text = await self.complete(context, prompt)
+        try:
+            review = json.loads(response_text)
+            approved = bool(review.get("approved", approved))
+            notes = review.get("notes", notes)
+        except json.JSONDecodeError:
+            pass
+
         lower_files = [name.lower() for name in files]
         has_gif = any(name.endswith(".gif") for name in lower_files)
         has_video = any(name.endswith(".mp4") or name.endswith(".webm") for name in lower_files)
