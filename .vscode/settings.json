@@ -1,3 +1,10 @@
 {
-    "chatgpt.openOnStartup": true
+    "chatgpt.openOnStartup": true,
+    "chat.mcp.serverSampling": {
+        "codex_swarm/.vscode/mcp.json: io.github.github/github-mcp-server": {
+            "allowedModels": [
+                "copilot/auto"
+            ]
+        }
+    }
 }

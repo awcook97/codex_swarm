@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import urllib.parse
 from typing import Any
 
 from swarm.agents.base import AgentContext, BaseAgent
@@ -38,12 +39,13 @@ class ResearcherAgent(BaseAgent):
             summary = None
 
         http_notes = ""
+        references: list[str] = []
         if context.config.enable_http and not context.dry_run:
             try:
-                slug = _slugify(context.objective)
-                url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{slug}" if slug else "https://example.com"
-                response = context.http.get(url)
-                http_notes = f"\n\nHTTP notes ({response.url}):\n{response.text[:500]}"
+                summary_text, refs = _fetch_wikipedia_summary(context.http, context.objective)
+                references.extend(refs)
+                if summary_text:
+                    http_notes = f"\n\nHTTP notes:\n{summary_text}"
             except Exception as exc:  # pragma: no cover - network path
                 http_notes = f"\n\nHTTP research failed: {exc}"
 
@@ -69,6 +71,8 @@ class ResearcherAgent(BaseAgent):
             context.short_term.put(context.run_id, self.name, "deliverable", deliverable)
         if needs:
             context.short_term.put(context.run_id, self.name, "needs", needs)
+        if references:
+            context.short_term.put(context.run_id, self.name, "references", references)
         research_path = context.output_dir / "research.md"
         handoff_path = context.output_dir / "handoff.json"
         if not context.dry_run:
@@ -82,13 +86,21 @@ class ResearcherAgent(BaseAgent):
                         "",
                         summary,
                         "",
+                        "References:",
+                        *references,
+                        "",
                     ]
                 ),
             )
             context.filesystem.write_text(
                 handoff_path,
                 json.dumps(
-                    {"summary": summary, "deliverable": deliverable, "needs": needs},
+                    {
+                        "summary": summary,
+                        "deliverable": deliverable,
+                        "needs": needs,
+                        "references": references,
+                    },
                     indent=2,
                 ),
             )
@@ -106,3 +118,34 @@ def _slugify(value: str) -> str:
         return ""
     cleaned = re.sub(r"[^a-z0-9]+", "-", lowered)
     return cleaned.strip("-")[:64]
+
+
+def _fetch_wikipedia_summary(http: Any, objective: str) -> tuple[str, list[str]]:
+    query = objective.strip()
+    if not query:
+        return "", []
+    search_url = (
+        "https://en.wikipedia.org/w/api.php?action=opensearch&search="
+        + _url_escape(query)
+        + "&limit=1&namespace=0&format=json"
+    )
+    response = http.get(search_url, timeout=6.0)
+    try:
+        payload = json.loads(response.text)
+    except json.JSONDecodeError:
+        return "", [response.url]
+    if len(payload) < 2 or not payload[1]:
+        return "", [response.url]
+    title = str(payload[1][0]).replace(" ", "_")
+    summary_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{title}"
+    summary_response = http.get(summary_url, timeout=6.0)
+    try:
+        summary_payload = json.loads(summary_response.text)
+        extract = summary_payload.get("extract") or ""
+    except json.JSONDecodeError:
+        extract = summary_response.text[:500]
+    return extract[:500], [response.url, summary_response.url]
+
+
+def _url_escape(value: str) -> str:
+    return urllib.parse.quote(value.strip())

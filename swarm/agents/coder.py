@@ -22,11 +22,19 @@ class CoderAgent(BaseAgent):
         deliverable = context.short_term.get(context.run_id, "researcher", "deliverable")
         needs = context.short_term.get(context.run_id, "researcher", "needs") or []
         handoff = _read_json(context, context.output_dir / "handoff.json")
-        plan = _read_text(context, context.output_dir / "plan.json")
+        plan_payload = _read_json(context, context.output_dir / "plan.json")
+        plan_text = _read_text(context, context.output_dir / "plan.json")
         if handoff:
             research = handoff.get("summary") or research
             deliverable = handoff.get("deliverable") or deliverable
             needs = handoff.get("needs") or needs
+        if plan_payload:
+            deliverable = plan_payload.get("deliverable") or deliverable
+            project_type = plan_payload.get("project_type")
+            artifacts = plan_payload.get("artifacts") or []
+        else:
+            project_type = None
+            artifacts = []
         if deliverable is None:
             prompt = "\n".join(
                 [
@@ -34,7 +42,7 @@ class CoderAgent(BaseAgent):
                     "Return JSON with fields: deliverable, subject, project_type.",
                     f"Objective: {context.objective}",
                     f"Research: {research}",
-                    f"Plan: {plan}",
+                    f"Plan: {plan_text}",
                 ]
             )
             response_text = await self.complete(context, prompt)
@@ -46,10 +54,10 @@ class CoderAgent(BaseAgent):
             except json.JSONDecodeError:
                 deliverable = None
                 subject = context.objective
-                project_type = None
+                project_type = project_type
         else:
             subject = context.objective
-            project_type = None
+            project_type = project_type
 
         deliverable = deliverable or _determine_deliverable(research)
         files = _build_project_files(
@@ -77,12 +85,28 @@ class CoderAgent(BaseAgent):
             }
         context.short_term.put(context.run_id, self.name, "artifact", str(artifact_dir))
         summary = "\n".join([f"{name}" for name in files.keys()])
+        manifest_path = context.output_dir / "artifact_manifest.json"
+        if not context.dry_run:
+            context.filesystem.write_text(
+                manifest_path,
+                json.dumps(
+                    {
+                        "deliverable": deliverable,
+                        "project_type": project_type,
+                        "requested_artifacts": artifacts,
+                        "produced_files": list(files.keys()),
+                        "needs": needs,
+                    },
+                    indent=2,
+                ),
+            )
         return {
             "artifact": str(artifact_dir),
             "files": list(files.keys()),
             "content": summary,
             "needs": needs,
             "deliverable": deliverable,
+            "manifest": str(manifest_path),
         }
 
 
@@ -98,6 +122,8 @@ def _build_project_files(
         return _animation_project(objective, task, research, subject)
     if deliverable == "python" or project_type == "python":
         return _python_game_project(objective, task, research)
+    if deliverable == "image_edit" or project_type == "image_edit":
+        return _image_edit_project(objective, task, research)
     return _landing_page_project(objective, task, research)
 
 
@@ -403,6 +429,57 @@ if __name__ == "__main__":
     }
 
 
+def _image_edit_project(objective: str, task: str, research: str) -> dict[str, str | bytes]:
+    return {
+        "edit_image.py": """from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+try:
+    from PIL import Image, ImageOps, ImageDraw, ImageFont
+except ImportError as exc:  # pragma: no cover
+    raise SystemExit("Install Pillow: pip install pillow") from exc
+
+
+def edit_image(input_path: Path, output_path: Path) -> None:
+    image = Image.open(input_path)
+    edited = ImageOps.autocontrast(image.convert("RGB"))
+    edited = ImageOps.posterize(edited, bits=4)
+    overlay = ImageDraw.Draw(edited)
+    overlay.rectangle([(12, 12), (edited.width - 12, 56)], fill=(15, 23, 42))
+    overlay.text((24, 22), "Swarm Edit", fill=(248, 250, 252))
+    edited.save(output_path)
+
+
+def main() -> None:
+    if len(sys.argv) < 3:
+        raise SystemExit("Usage: python edit_image.py input.jpg output.jpg")
+    input_path = Path(sys.argv[1])
+    output_path = Path(sys.argv[2])
+    edit_image(input_path, output_path)
+
+
+if __name__ == "__main__":
+    main()
+""",
+        "requirements.txt": "pillow>=10.0\n",
+        "README.md": "\n".join(
+            [
+                "# Image Edit Project",
+                "",
+                f"Objective: {objective}",
+                "",
+                "Usage:",
+                "python edit_image.py input.jpg output.jpg",
+                "",
+                "This script applies auto-contrast and a posterized stylization.",
+                "",
+            ]
+        ),
+    }
+
+
 def _read_text(context: AgentContext, path: Path) -> str:
     try:
         return context.filesystem.read_text(path)
@@ -655,6 +732,10 @@ def _determine_deliverable(research: str) -> str:
     combined = f"{research}".lower()
     if "deliverable:" in combined and "gif" in combined:
         return "gif"
+    if "deliverable:" in combined and "python" in combined:
+        return "python"
+    if "deliverable:" in combined and "image" in combined:
+        return "image_edit"
     if "gif encoder" in combined or "animated gif" in combined:
         return "gif"
     return "html"

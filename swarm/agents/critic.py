@@ -62,6 +62,12 @@ class CriticAgent(BaseAgent):
         elif not (has_gif or has_video or has_python) and "index.html" not in lower_files:
             approved = False
             notes = "Missing index.html; include a primary entrypoint."
+        else:
+            required = _read_artifact_requirements(context)
+            missing = [name for name in required if name.lower() not in lower_files]
+            if missing:
+                approved = False
+                notes = f"Missing required files: {', '.join(missing)}"
 
         review_path = context.output_dir / f"critic_step_{step_id}.md"
         if not context.dry_run:
@@ -81,3 +87,15 @@ class CriticAgent(BaseAgent):
                 ),
             )
         return {"approved": approved, "notes": notes, "files": [str(review_path)]}
+
+
+def _read_artifact_requirements(context: AgentContext) -> list[str]:
+    plan_path = context.output_dir / "plan.json"
+    try:
+        payload = json.loads(context.filesystem.read_text(plan_path))
+    except Exception:
+        return []
+    artifacts = payload.get("artifacts")
+    if isinstance(artifacts, list):
+        return [str(item) for item in artifacts]
+    return []
