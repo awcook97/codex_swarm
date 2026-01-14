@@ -26,5 +26,27 @@ class ResearcherAgent(BaseAgent):
                 "Research stub: No HTTP calls made. Provide general guidance and assumptions "
                 "based on the objective."
             )
+        lowered = context.objective.lower()
+        if "animation" in lowered or "movie" in lowered:
+            result = (
+                f"{result}\n\nSuggested deliverable: animated GIF (or short video).\n"
+                "Needs: gif encoder or video render pipeline.\n"
+                "Deliverable: animated gif"
+            )
         context.short_term.put(context.run_id, self.name, "research", result)
-        return {"summary": result}
+        research_path = context.output_dir / "research.md"
+        if not context.dry_run:
+            context.filesystem.write_text(
+                research_path,
+                "\n".join(
+                    [
+                        "# Research Notes",
+                        "",
+                        f"Objective: {context.objective}",
+                        "",
+                        result,
+                        "",
+                    ]
+                ),
+            )
+        return {"summary": result, "files": [str(research_path)]}

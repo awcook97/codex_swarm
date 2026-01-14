@@ -34,4 +34,4 @@ swarm.db
 .DS_Store
 Thumbs.db
 
-.github/*
+output/**/*

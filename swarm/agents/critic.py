@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from typing import Any
 
 from swarm.agents.base import AgentContext, BaseAgent
@@ -17,7 +18,44 @@ class CriticAgent(BaseAgent):
         self.log(context, f"Reviewing output: {task}")
         approved = True
         notes = "Looks good."
-        if len(task.strip()) < 10:
+        step_id = "unknown"
+        try:
+            payload = json.loads(task)
+            step_id = payload.get("step_id", "unknown")
+            output = payload.get("output", {})
+        except json.JSONDecodeError:
+            output = {}
+
+        files = output.get("files", [])
+        lower_files = [name.lower() for name in files]
+        has_gif = any(name.endswith(".gif") for name in lower_files)
+        has_video = any(name.endswith(".mp4") or name.endswith(".webm") for name in lower_files)
+        has_html = any(name.endswith(".html") for name in lower_files)
+        if not files:
             approved = False
-            notes = "Output is too short; expand with more detail."
-        return {"approved": approved, "notes": notes}
+            notes = "No files were produced; generate a project with concrete outputs."
+        elif not (has_gif or has_video or has_html):
+            approved = False
+            notes = "Missing primary deliverable; include a GIF/video or HTML entrypoint."
+        elif not (has_gif or has_video) and "index.html" not in lower_files:
+            approved = False
+            notes = "Missing index.html; include a primary entrypoint."
+
+        review_path = context.output_dir / f"critic_step_{step_id}.md"
+        if not context.dry_run:
+            context.filesystem.write_text(
+                review_path,
+                "\n".join(
+                    [
+                        "# Critic Review",
+                        "",
+                        f"Step: {step_id}",
+                        f"Approved: {approved}",
+                        "",
+                        "Notes:",
+                        notes,
+                        "",
+                    ]
+                ),
+            )
+        return {"approved": approved, "notes": notes, "files": [str(review_path)]}

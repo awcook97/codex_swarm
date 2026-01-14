@@ -130,6 +130,64 @@ class Coordinator:
             "events": self.event_log.list_events(),
         }
 
+    async def _run_step(self, step: dict[str, Any], context: AgentContext) -> StepResult:
+        agent_name = step.get("agent", "")
+        task = step.get("task", "")
+        agent = self.agents.get(agent_name)
+        if agent is None:
+            raise ValueError(f"Unknown agent: {agent_name}")
+        self.event_log.log("step_started", {"step_id": step.get("id"), "agent": agent_name})
+        output = await agent.run(task, context)
+        created_at = datetime.now(timezone.utc).isoformat()
+        self.persistent.put_message(context.run_id, agent.name, agent.role, json.dumps(output), created_at)
+        self.event_log.log("step_completed", {"step_id": step.get("id"), "agent": agent_name})
+
+        critic_result = None
+        if agent_name != "critic":
+            critic = self.agents["critic"]
+            critic_payload = {"step_id": step.get("id"), "agent": agent_name, "output": output}
+            critic_result = await critic.run(json.dumps(critic_payload), context)
+            self.event_log.log(
+                "critic_review",
+                {"step_id": step.get("id"), "approved": critic_result.get("approved")},
+            )
+            if not critic_result.get("approved", True):
+                retry_task = f"{task}\n\nCritic feedback: {critic_result.get('notes')}"
+                output = await agent.run(retry_task, context)
+                created_at = datetime.now(timezone.utc).isoformat()
+                self.persistent.put_message(
+                    context.run_id,
+                    agent.name,
+                    agent.role,
+                    json.dumps(output),
+                    created_at,
+                )
+                critic_payload = {"step_id": step.get("id"), "agent": agent_name, "output": output}
+                critic_result = await critic.run(json.dumps(critic_payload), context)
+                self.event_log.log(
+                    "critic_review",
+                    {"step_id": step.get("id"), "approved": critic_result.get("approved")},
+                )
+        return StepResult(
+            step_id=step.get("id", 0),
+            agent=agent_name,
+            task=task,
+            output=output,
+            critic=critic_result,
+        )
+
+    def _compose_final_output(self, results: dict[int, StepResult]) -> str:
+        ordered = [results[key] for key in sorted(results.keys())]
+        sections: list[str] = []
+        for item in ordered:
+            if item.agent == "coder" and "content" in item.output:
+                sections.append(str(item.output["content"]))
+            else:
+                sections.append(f"{item.agent}: {item.output}")
+            if item.critic and not item.critic.get("approved", True):
+                sections.append(f"Critic note: {item.critic.get('notes')}")
+        return "\n".join(sections).strip()
+
     def _resolve_output_dir(
         self, objective: str, run_id: str, output_dir: str | Path | None
     ) -> Path:
@@ -150,37 +208,3 @@ def _slugify(value: str) -> str:
         return ""
     cleaned = re.sub(r"[^a-z0-9]+", "-", lowered)
     return cleaned.strip("-")[:64]
-
-    async def _run_step(self, step: dict[str, Any], context: AgentContext) -> StepResult:
-        agent_name = step.get("agent", "")
-        task = step.get("task", "")
-        agent = self.agents.get(agent_name)
-        if agent is None:
-            raise ValueError(f"Unknown agent: {agent_name}")
-        self.event_log.log("step_started", {"step_id": step.get("id"), "agent": agent_name})
-        output = await agent.run(task, context)
-        created_at = datetime.now(timezone.utc).isoformat()
-        self.persistent.put_message(context.run_id, agent.name, agent.role, json.dumps(output), created_at)
-        self.event_log.log("step_completed", {"step_id": step.get("id"), "agent": agent_name})
-
-        critic_result = None
-        if agent_name != "critic":
-            critic = self.agents["critic"]
-            critic_result = await critic.run(json.dumps(output), context)
-            self.event_log.log(
-                "critic_review",
-                {"step_id": step.get("id"), "approved": critic_result.get("approved")},
-            )
-        return StepResult(step_id=step.get("id", 0), agent=agent_name, task=task, output=output, critic=critic_result)
-
-    def _compose_final_output(self, results: dict[int, StepResult]) -> str:
-        ordered = [results[key] for key in sorted(results.keys())]
-        sections: list[str] = []
-        for item in ordered:
-            if item.agent == "coder" and "content" in item.output:
-                sections.append(str(item.output["content"]))
-            else:
-                sections.append(f"{item.agent}: {item.output}")
-            if item.critic and not item.critic.get("approved", True):
-                sections.append(f"Critic note: {item.critic.get('notes')}")
-        return "\n".join(sections).strip()

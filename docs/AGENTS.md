@@ -16,3 +16,4 @@ Conventions:
 - Follow SwarmConfig allowlists for filesystem, shell, and HTTP tools.
 - Prefer deterministic, reproducible behavior by default.
 - Write artifacts into the shared output directory.
+- Planner/researcher/critic emit supporting files alongside coder outputs.

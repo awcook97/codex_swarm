@@ -28,4 +28,7 @@ class PlannerAgent(BaseAgent):
                 ]
             }
         context.short_term.put(context.run_id, self.name, "plan", plan)
-        return {"plan": plan}
+        plan_path = context.output_dir / "plan.json"
+        if not context.dry_run:
+            context.filesystem.write_text(plan_path, json.dumps(plan, indent=2))
+        return {"plan": plan, "files": [str(plan_path)]}
