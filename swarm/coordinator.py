@@ -54,6 +54,9 @@ class Coordinator:
             "coder": CoderAgent(
                 instructions=load_agent_instructions(self.config.repo_root, "coder")
             ),
+            "dispatcher": DispatcherAgent(
+                instructions=load_agent_instructions(self.config.repo_root, "dispatcher")
+            ),
             "critic": CriticAgent(
                 instructions=load_agent_instructions(self.config.repo_root, "critic")
             ),

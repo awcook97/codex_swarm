@@ -3,7 +3,32 @@
     "chat.mcp.serverSampling": {
         "codex_swarm/.vscode/mcp.json: io.github.github/github-mcp-server": {
             "allowedModels": [
-                "copilot/auto"
+                "copilot/auto",
+                "copilot/claude-haiku-4.5",
+                "copilot/gpt-4.1",
+                "copilot/gpt-4o",
+                "copilot/gpt-5-mini",
+                "copilot/oswe-vscode-prime"
+            ]
+        },
+        "codex_swarm/.vscode/mcp.json: microsoft/playwright-mcp": {
+            "allowedModels": [
+                "copilot/auto",
+                "copilot/claude-haiku-4.5",
+                "copilot/gpt-4.1",
+                "copilot/gpt-4o",
+                "copilot/gpt-5-mini",
+                "copilot/oswe-vscode-prime"
+            ]
+        },
+        "codex_swarm/.vscode/mcp.json: my-mcp-server-4952eeb8": {
+            "allowedModels": [
+                "copilot/auto",
+                "copilot/claude-haiku-4.5",
+                "copilot/gpt-4.1",
+                "copilot/gpt-4o",
+                "copilot/gpt-5-mini",
+                "copilot/oswe-vscode-prime"
             ]
         }
     }
