@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+msg_file="$1"
+
+# Build a short summary from staged changes.
+mapfile -t files < <(git diff --cached --name-only)
+if [ "${#files[@]}" -eq 0 ]; then
+  exit 0
+fi
+
+summary="Update: "
+for file in "${files[@]}"; do
+  summary+="$file, "
+done
+summary=${summary%, }
+
+printf "%s\n" "$summary" > "$msg_file"
