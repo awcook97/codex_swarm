@@ -22,6 +22,18 @@ Outputs are written to `output/<slug>` by default (or `-o/--output-dir`) and run
 python -m swarm "build me a 5 stage rocket animation" --llm-provider ollama --ollama-model llama3.1
 ```
 
+If your Ollama server uses a different endpoint, pass it explicitly:
+
+```bash
+python -m swarm "build me a 5 stage rocket animation" --llm-provider ollama --ollama-model llama3.1 --ollama-endpoint /api/chat
+```
+
+For large models, you may want a longer timeout:
+
+```bash
+python -m swarm "make a snake game" --llm-provider ollama --ollama-model llama3.1 --ollama-timeout 120
+```
+
 ## Adding a new agent
 
 1. Create a new agent in `swarm/agents/` that subclasses `BaseAgent` and implements `async run()`.

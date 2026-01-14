@@ -86,32 +86,53 @@ class MockLLM(LLM):
 
 
 class OllamaLLM(LLM):
-    def __init__(self, model: str, url: str) -> None:
+    def __init__(self, model: str, base_url: str, endpoint: str, timeout: int, retries: int) -> None:
         self._model = model
-        self._url = url
+        self._base_url = base_url.rstrip("/")
+        self._endpoint = endpoint
+        self._timeout = timeout
+        self._retries = max(0, retries)
 
     async def complete(self, prompt: str) -> LLMResponse:
-        payload = {
-            "model": self._model,
-            "prompt": prompt,
-            "stream": False,
-        }
-        try:
-            response = await asyncio.to_thread(self._post, payload)
-        except urllib.error.URLError as exc:
-            raise RuntimeError(f"Ollama request failed: {exc}") from exc
-        content = response.get("response", "")
-        return LLMResponse(content=content)
+        payload = {"model": self._model, "prompt": prompt, "stream": False}
+        response = await self._post_with_retries(payload)
+        content = response.get("response")
+        if content is None:
+            message = response.get("message", {})
+            content = message.get("content", "")
+        return LLMResponse(content=content or "")
 
-    def _post(self, payload: dict[str, Any]) -> dict[str, Any]:
+    async def _post_with_retries(self, payload: dict[str, Any]) -> dict[str, Any]:
+        attempts = self._retries + 1
+        last_exc: Exception | None = None
+        for _ in range(attempts):
+            try:
+                return await asyncio.to_thread(self._post, self._endpoint, payload)
+            except TimeoutError as exc:
+                last_exc = exc
+            except urllib.error.HTTPError as exc:
+                if exc.code == 404 and self._endpoint != "/api/chat":
+                    chat_payload = {
+                        "model": self._model,
+                        "messages": [{"role": "user", "content": payload["prompt"]}],
+                        "stream": False,
+                    }
+                    return await asyncio.to_thread(self._post, "/api/chat", chat_payload)
+                last_exc = exc
+            except urllib.error.URLError as exc:
+                last_exc = exc
+        raise RuntimeError(f"Ollama request failed: {last_exc}") from last_exc
+
+    def _post(self, endpoint: str, payload: dict[str, Any]) -> dict[str, Any]:
         data = json.dumps(payload).encode("utf-8")
+        url = f"{self._base_url}{endpoint}"
         request = urllib.request.Request(
-            self._url,
+            url,
             data=data,
             headers={"Content-Type": "application/json"},
             method="POST",
         )
-        with urllib.request.urlopen(request, timeout=30) as response:
+        with urllib.request.urlopen(request, timeout=self._timeout) as response:
             body = response.read().decode("utf-8")
         return json.loads(body)
 

@@ -24,8 +24,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="LLM provider to use",
     )
     parser.add_argument("--ollama-model", type=str, default=None, help="Ollama model name")
-    parser.add_argument("--ollama-url", type=str, default=None, help="Ollama generate URL")
+    parser.add_argument("--ollama-url", type=str, default=None, help="Ollama base URL")
+    parser.add_argument("--ollama-endpoint", type=str, default=None, help="Ollama endpoint")
+    parser.add_argument("--ollama-timeout", type=int, default=None, help="Ollama request timeout (s)")
+    parser.add_argument("--ollama-retries", type=int, default=None, help="Ollama retry count")
     parser.add_argument("--enable-http", action="store_true", help="Enable HTTP for research")
+    parser.add_argument("--log-llm", action="store_true", help="Log LLM prompts/responses")
     return parser
 
 
@@ -41,8 +45,16 @@ def main() -> int:
         config.ollama_model = args.ollama_model
     if args.ollama_url:
         config.ollama_url = args.ollama_url
+    if args.ollama_endpoint:
+        config.ollama_endpoint = args.ollama_endpoint
+    if args.ollama_timeout is not None:
+        config.ollama_timeout = args.ollama_timeout
+    if args.ollama_retries is not None:
+        config.ollama_retries = args.ollama_retries
     if args.enable_http:
         config.enable_http = True
+    if args.log_llm:
+        config.log_llm = True
     coordinator = Coordinator(config=config)
 
     result = asyncio.run(

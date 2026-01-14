@@ -15,7 +15,11 @@ class SwarmConfig:
     max_steps: int = 10
     enable_http: bool = False
     llm_provider: str = "mock"
-    ollama_url: str = "http://localhost:11434/api/generate"
+    ollama_url: str = "http://localhost:11434"
+    ollama_endpoint: str = "/api/generate"
+    log_llm: bool = False
+    ollama_timeout: int = 120
+    ollama_retries: int = 1
     ollama_model: str = "llama3.1"
     shell_allowlist: Sequence[str] = field(default_factory=lambda: ["ls", "rg", "cat"])
     filesystem_allowlist: Sequence[Path] = field(default_factory=list)

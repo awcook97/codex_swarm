@@ -48,9 +48,35 @@ class BaseAgent:
             "llm_prompt",
             {"agent": self.name, "role": self.role, "prompt": prompt},
         )
+        if context.config.log_llm and not context.dry_run:
+            log_path = context.output_dir / "llm.log"
+            context.filesystem.append_text(
+                log_path,
+                "\n".join(
+                    [
+                        "=== PROMPT ===",
+                        f"agent={self.name} role={self.role}",
+                        prompt,
+                        "",
+                    ]
+                ),
+            )
         response = await context.llm.complete(prompt)
         context.event_log.log(
             "llm_response",
             {"agent": self.name, "role": self.role, "response": response.content},
         )
+        if context.config.log_llm and not context.dry_run:
+            log_path = context.output_dir / "llm.log"
+            context.filesystem.append_text(
+                log_path,
+                "\n".join(
+                    [
+                        "=== RESPONSE ===",
+                        f"agent={self.name} role={self.role}",
+                        response.content,
+                        "",
+                    ]
+                ),
+            )
         return response.content

@@ -22,6 +22,13 @@ class FilesystemTool:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(content, encoding="utf-8")
 
+    def append_text(self, path: Path, content: str) -> None:
+        if not self._is_allowed(path):
+            raise PermissionError(f"Path not allowed: {path}")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("a", encoding="utf-8") as handle:
+            handle.write(content)
+
     def write_bytes(self, path: Path, content: bytes) -> None:
         if not self._is_allowed(path):
             raise PermissionError(f"Path not allowed: {path}")

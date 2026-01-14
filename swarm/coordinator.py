@@ -61,7 +61,13 @@ class Coordinator:
 
     def _build_llm(self) -> LLM:
         if self.config.llm_provider == "ollama":
-            return OllamaLLM(model=self.config.ollama_model, url=self.config.ollama_url)
+            return OllamaLLM(
+                model=self.config.ollama_model,
+                base_url=self.config.ollama_url,
+                endpoint=self.config.ollama_endpoint,
+                timeout=self.config.ollama_timeout,
+                retries=self.config.ollama_retries,
+            )
         return MockLLM(seed=self.config.seed)
 
     def _context(
