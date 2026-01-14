@@ -6,11 +6,11 @@ from swarm.agents.base import AgentContext, BaseAgent
 
 
 class CriticAgent(BaseAgent):
-    def __init__(self) -> None:
+    def __init__(self, instructions: str | None = None) -> None:
         super().__init__(
             name="critic",
             role="Critic",
-            instructions="Review outputs for clarity and completeness.",
+            instructions=instructions or "Review outputs for clarity and completeness.",
         )
 
     async def run(self, task: str, context: AgentContext) -> dict[str, Any]:

@@ -12,6 +12,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Run the AI Swarm coordinator.")
     parser.add_argument("objective", type=str, help="Objective for the swarm")
     parser.add_argument("--run-id", type=str, default=None, help="Override run identifier")
+    parser.add_argument("-o", "--output-dir", type=str, default=None, help="Output directory")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
     parser.add_argument("--max-steps", type=int, default=None, help="Maximum steps to execute")
     parser.add_argument("--dry-run", action="store_true", help="Plan and log without writing files")
@@ -30,6 +31,7 @@ def main() -> int:
         coordinator.run(
             objective=args.objective,
             run_id=args.run_id,
+            output_dir=args.output_dir,
             max_steps=args.max_steps,
             dry_run=args.dry_run,
             verbose=args.verbose,
@@ -37,5 +39,5 @@ def main() -> int:
     )
 
     print(result["final"])
-    print(f"Artifacts: {result['artifacts_dir']}")
+    print(f"Output: {result['output_dir']}")
     return 0

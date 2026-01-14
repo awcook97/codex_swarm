@@ -8,16 +8,16 @@ from swarm.agents.base import AgentContext, BaseAgent
 
 
 class CoderAgent(BaseAgent):
-    def __init__(self) -> None:
+    def __init__(self, instructions: str | None = None) -> None:
         super().__init__(
             name="coder",
             role="Coder",
-            instructions="Create artifacts or code changes based on tasks.",
+            instructions=instructions or "Create artifacts or code changes based on tasks.",
         )
 
     async def run(self, task: str, context: AgentContext) -> dict[str, Any]:
         self.log(context, f"Coding task: {task}")
-        artifact_dir = context.config.artifacts_dir / context.run_id
+        artifact_dir = context.output_dir
         artifact_path = artifact_dir / "result.txt"
         content = (
             f"Objective: {context.objective}\n"

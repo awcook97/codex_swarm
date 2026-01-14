@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
 from swarm.agents import (
@@ -15,6 +17,7 @@ from swarm.agents import (
     PlannerAgent,
     ResearcherAgent,
 )
+from swarm.agents.instructions import load_agent_instructions
 from swarm.bus import EventLog
 from swarm.config import SwarmConfig
 from swarm.llm import LLM, MockLLM
@@ -42,17 +45,28 @@ class Coordinator:
         self.http = HttpTool()
         self.llm = llm or MockLLM(seed=config.seed)
         self.agents: dict[str, BaseAgent] = {
-            "researcher": ResearcherAgent(),
-            "planner": PlannerAgent(),
-            "coder": CoderAgent(),
-            "critic": CriticAgent(),
+            "researcher": ResearcherAgent(
+                instructions=load_agent_instructions(self.config.repo_root, "researcher")
+            ),
+            "planner": PlannerAgent(
+                instructions=load_agent_instructions(self.config.repo_root, "planner")
+            ),
+            "coder": CoderAgent(
+                instructions=load_agent_instructions(self.config.repo_root, "coder")
+            ),
+            "critic": CriticAgent(
+                instructions=load_agent_instructions(self.config.repo_root, "critic")
+            ),
         }
 
-    def _context(self, run_id: str, objective: str, dry_run: bool, verbose: bool) -> AgentContext:
+    def _context(
+        self, run_id: str, objective: str, output_dir: Path, dry_run: bool, verbose: bool
+    ) -> AgentContext:
         return AgentContext(
             run_id=run_id,
             objective=objective,
             config=self.config,
+            output_dir=output_dir,
             event_log=self.event_log,
             short_term=self.short_term,
             persistent=self.persistent,
@@ -68,16 +82,18 @@ class Coordinator:
         self,
         objective: str,
         run_id: str | None = None,
+        output_dir: str | Path | None = None,
         max_steps: int | None = None,
         dry_run: bool = False,
         verbose: bool = False,
     ) -> dict[str, Any]:
         run_id = run_id or uuid.uuid4().hex
+        resolved_output = self._resolve_output_dir(objective, run_id, output_dir)
         created_at = datetime.now(timezone.utc).isoformat()
         self.persistent.put_run(run_id, objective, created_at)
         self.event_log.log("run_started", {"run_id": run_id, "objective": objective})
 
-        context = self._context(run_id, objective, dry_run, verbose)
+        context = self._context(run_id, objective, resolved_output, dry_run, verbose)
         planner = self.agents["planner"]
         plan_output = await planner.run(objective, context)
         plan = plan_output.get("plan", {})
@@ -110,9 +126,30 @@ class Coordinator:
             "run_id": run_id,
             "objective": objective,
             "final": final_text,
-            "artifacts_dir": str(self.config.artifacts_dir / run_id),
+            "output_dir": str(resolved_output),
             "events": self.event_log.list_events(),
         }
+
+    def _resolve_output_dir(
+        self, objective: str, run_id: str, output_dir: str | Path | None
+    ) -> Path:
+        if output_dir is None:
+            slug = _slugify(objective) or run_id
+            return self.config.output_root / slug
+        candidate = Path(output_dir)
+        if not candidate.is_absolute():
+            candidate = self.config.repo_root / candidate
+        if self.config.repo_root not in candidate.resolve().parents and candidate.resolve() != self.config.repo_root:
+            raise ValueError("output_dir must be inside the repo_root")
+        return candidate
+
+
+def _slugify(value: str) -> str:
+    lowered = value.strip().lower()
+    if not lowered:
+        return ""
+    cleaned = re.sub(r"[^a-z0-9]+", "-", lowered)
+    return cleaned.strip("-")[:64]
 
     async def _run_step(self, step: dict[str, Any], context: AgentContext) -> StepResult:
         agent_name = step.get("agent", "")

@@ -6,11 +6,11 @@ from swarm.agents.base import AgentContext, BaseAgent
 
 
 class ResearcherAgent(BaseAgent):
-    def __init__(self) -> None:
+    def __init__(self, instructions: str | None = None) -> None:
         super().__init__(
             name="researcher",
             role="Researcher",
-            instructions="Gather context relevant to the objective.",
+            instructions=instructions or "Gather context relevant to the objective.",
         )
 
     async def run(self, task: str, context: AgentContext) -> dict[str, Any]:

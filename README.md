@@ -11,10 +11,10 @@ python -m swarm "test"
 Optional flags:
 
 ```bash
-python -m swarm "my objective" --run-id demo --max-steps 3 --dry-run --verbose
+python -m swarm "my objective" --run-id demo --max-steps 3 --dry-run --verbose -o output/demo
 ```
 
-Artifacts are written to `artifacts/<run_id>` and run metadata is stored in `swarm.db`.
+Outputs are written to `output/<slug>` by default (or `-o/--output-dir`) and run metadata is stored in `swarm.db`.
 
 ## Adding a new agent
 
@@ -48,3 +48,8 @@ coordinator = Coordinator(config=config, llm=RealLLM())
 ```bash
 pytest
 ```
+
+## Docs
+
+- Agents overview: docs/AGENTS.md
+- Coordinator: docs/COORDINATOR.md

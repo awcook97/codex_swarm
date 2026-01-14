@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from swarm.bus import EventLog
@@ -15,6 +16,7 @@ class AgentContext:
     run_id: str
     objective: str
     config: SwarmConfig
+    output_dir: Path
     event_log: EventLog
     short_term: ShortTermMemory
     persistent: PersistentMemory

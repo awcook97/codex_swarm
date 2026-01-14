@@ -7,11 +7,11 @@ from swarm.agents.base import AgentContext, BaseAgent
 
 
 class PlannerAgent(BaseAgent):
-    def __init__(self) -> None:
+    def __init__(self, instructions: str | None = None) -> None:
         super().__init__(
             name="planner",
             role="Planner",
-            instructions="Break objectives into structured steps.",
+            instructions=instructions or "Break objectives into structured steps.",
         )
 
     async def run(self, task: str, context: AgentContext) -> dict[str, Any]:

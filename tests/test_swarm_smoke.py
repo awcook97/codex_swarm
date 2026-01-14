@@ -12,7 +12,8 @@ def test_swarm_smoke(tmp_path: Path) -> None:
     config = SwarmConfig.from_repo_root(repo_root)
     config.db_path = tmp_path / "swarm.db"
     config.artifacts_dir = tmp_path / "artifacts"
-    config.filesystem_allowlist = [repo_root, config.artifacts_dir]
+    config.output_root = tmp_path / "output"
+    config.filesystem_allowlist = [repo_root, config.artifacts_dir, config.output_root]
 
     coordinator = Coordinator(config=config)
     result = asyncio.run(
