@@ -21,6 +21,10 @@ class SwarmConfig:
     ollama_timeout: int = 120
     ollama_retries: int = 1
     ollama_model: str = "llama3.1"
+    search_provider: str | None = None
+    search_endpoint: str | None = None
+    search_api_key: str | None = None
+    search_max_results: int = 5
     shell_allowlist: Sequence[str] = field(default_factory=lambda: ["ls", "rg", "cat"])
     filesystem_allowlist: Sequence[Path] = field(default_factory=list)
 

@@ -61,6 +61,27 @@ coordinator = Coordinator(config=config, llm=RealLLM())
 - Shell execution is limited to an allowlist of commands.
 - HTTP requests are disabled by default (`enable_http=False`) to avoid accidental network access.
 
+## Web search (optional)
+
+When `--enable-http` is set, the researcher can pull web search results from a provider.
+If no provider is configured, it defaults to DuckDuckGo HTML results.
+
+Examples:
+
+```bash
+python -m swarm "draft a product brief" --enable-http --search-provider searxng --search-endpoint https://your-searxng.example
+```
+
+```bash
+python -m swarm "draft a product brief" --enable-http --search-provider duckduckgo
+```
+
+DuckDuckGo uses the public HTML results page (no API key) and may be rate limited.
+
+```bash
+SERPER_API_KEY=... python -m swarm "draft a product brief" --enable-http --search-provider serper
+```
+
 ## Tests
 
 ```bash

@@ -30,6 +30,30 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--ollama-retries", type=int, default=None, help="Ollama retry count")
     parser.add_argument("--enable-http", action="store_true", help="Enable HTTP for research")
     parser.add_argument("--log-llm", action="store_true", help="Log LLM prompts/responses")
+    parser.add_argument(
+        "--search-provider",
+        type=str,
+        default=None,
+        help="Web search provider (auto, duckduckgo, searxng, serpapi, serper, brave, bing, google)",
+    )
+    parser.add_argument(
+        "--search-endpoint",
+        type=str,
+        default=None,
+        help="Search endpoint base URL (used by searxng or custom providers)",
+    )
+    parser.add_argument(
+        "--search-api-key",
+        type=str,
+        default=None,
+        help="Search API key (overrides provider-specific env vars)",
+    )
+    parser.add_argument(
+        "--search-max-results",
+        type=int,
+        default=None,
+        help="Max search results to include in research (default 5)",
+    )
     return parser
 
 
@@ -55,6 +79,14 @@ def main() -> int:
         config.enable_http = True
     if args.log_llm:
         config.log_llm = True
+    if args.search_provider:
+        config.search_provider = args.search_provider
+    if args.search_endpoint:
+        config.search_endpoint = args.search_endpoint
+    if args.search_api_key:
+        config.search_api_key = args.search_api_key
+    if args.search_max_results is not None:
+        config.search_max_results = args.search_max_results
     coordinator = Coordinator(config=config)
 
     result = asyncio.run(

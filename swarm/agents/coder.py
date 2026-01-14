@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import html
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -60,8 +61,17 @@ class CoderAgent(BaseAgent):
             project_type = project_type
 
         deliverable = deliverable or _determine_deliverable(research)
+        landing_spec = None
+        if _is_landing_page(deliverable, project_type):
+            landing_spec = await _landing_page_spec(self, context, context.objective, task, research)
         files = _build_project_files(
-            context.objective, task, research, deliverable, subject=subject, project_type=project_type
+            context.objective,
+            task,
+            research,
+            deliverable,
+            subject=subject,
+            project_type=project_type,
+            landing_spec=landing_spec,
         )
         artifact_dir = context.output_dir
         if not context.dry_run:
@@ -117,6 +127,7 @@ def _build_project_files(
     deliverable: str,
     subject: str,
     project_type: str | None,
+    landing_spec: dict[str, Any] | None = None,
 ) -> dict[str, str | bytes]:
     if deliverable == "gif" or project_type == "animation":
         return _animation_project(objective, task, research, subject)
@@ -124,142 +135,772 @@ def _build_project_files(
         return _python_game_project(objective, task, research)
     if deliverable == "image_edit" or project_type == "image_edit":
         return _image_edit_project(objective, task, research)
-    return _landing_page_project(objective, task, research)
+    return _landing_page_project(objective, task, research, landing_spec)
 
 
-def _landing_page_project(objective: str, task: str, research: str) -> dict[str, str]:
-    title = _title_from_objective(objective)
+def _is_landing_page(deliverable: str | None, project_type: str | None) -> bool:
+    if project_type in {"animation", "python", "image_edit"}:
+        return False
+    if deliverable in {"gif", "python", "image_edit"}:
+        return False
+    return True
+
+
+async def _landing_page_spec(
+    agent: BaseAgent,
+    context: AgentContext,
+    objective: str,
+    task: str,
+    research: str,
+) -> dict[str, Any]:
+    if context.dry_run:
+        return {}
+    prompt = "\n".join(
+        [
+            "ROLE: Coder",
+            "Return strict JSON only. No markdown.",
+            "Use ASCII characters only.",
+            "Create copy for a single-page landing page.",
+            "Fields: name, eyebrow, tagline, cta_primary, cta_secondary, hours, location, footer_note.",
+            "highlights: array of 3 objects with title, body.",
+            "events: array of 3 objects with date, title, detail.",
+            "membership: object with title, body, cta.",
+            "shelf: array of 3 objects with title, subtitle.",
+            f"Objective: {objective}",
+            f"Task: {task}",
+            f"Research: {research}",
+        ]
+    )
+    response_text = await agent.complete(context, prompt)
+    payload = _extract_json(response_text)
+    return payload if isinstance(payload, dict) else {}
+
+
+def _landing_page_project(
+    objective: str, task: str, research: str, landing_spec: dict[str, Any] | None
+) -> dict[str, str]:
+    resolved = _normalize_landing_spec(objective, landing_spec)
+    name = _escape(resolved["name"])
+    eyebrow = _escape(resolved["eyebrow"])
+    tagline = _escape(resolved["tagline"])
+    cta_primary = _escape(resolved["cta_primary"])
+    cta_secondary = _escape(resolved["cta_secondary"])
+    hours = _escape(resolved["hours"])
+    location = _escape(resolved["location"])
+    footer_note = _escape(resolved["footer_note"])
+    membership = resolved["membership"]
+    membership_title = _escape(membership["title"])
+    membership_body = _escape(membership["body"])
+    membership_cta = _escape(membership["cta"])
+    highlights = resolved["highlights"]
+    events = resolved["events"]
+    shelf = resolved["shelf"]
+    is_bookish = any(word in objective.lower() for word in ["book", "bookstore", "library"])
+    highlights_eyebrow = "Inside the shop" if is_bookish else "Inside the studio"
+    highlights_title = "Find your next favorite" if is_bookish else "Build a focused experience"
+    events_eyebrow = "Events" if is_bookish else "Calendar"
+    events_title = "This week's gatherings" if is_bookish else "Upcoming moments"
+    badge_text = "Curated weekly" if is_bookish else "Fresh releases"
+
+    shelf_cards = "\n".join(
+        "\n".join(
+            [
+                f"            <div class=\"book book-{index}\">",
+                f"              <span class=\"book-title\">{_escape(item['title'])}</span>",
+                f"              <span class=\"book-subtitle\">{_escape(item['subtitle'])}</span>",
+                "            </div>",
+            ]
+        )
+        for index, item in enumerate(shelf, start=1)
+    )
+
+    highlight_cards = "\n".join(
+        "\n".join(
+            [
+                "        <article class=\"card reveal\">",
+                f"          <h3>{_escape(item['title'])}</h3>",
+                f"          <p>{_escape(item['body'])}</p>",
+                "        </article>",
+            ]
+        )
+        for item in highlights
+    )
+
+    event_rows = "\n".join(
+        "\n".join(
+            [
+                "        <div class=\"event reveal\">",
+                f"          <div class=\"event-date\">{_escape(item['date'])}</div>",
+                "          <div class=\"event-info\">",
+                f"            <h3>{_escape(item['title'])}</h3>",
+                f"            <p>{_escape(item['detail'])}</p>",
+                "          </div>",
+                "        </div>",
+            ]
+        )
+        for item in events
+    )
+
     return {
         "index.html": f"""<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title}</title>
+    <title>{name}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <div class="background">
+      <span class="orb orb-one"></span>
+      <span class="orb orb-two"></span>
+      <span class="orb orb-three"></span>
+    </div>
     <main class="page">
       <header class="hero">
-        <p class="eyebrow">Project</p>
-        <h1>{title}</h1>
-        <p class="subtitle">{objective}</p>
-        <div class="actions">
-          <button class="primary">Launch</button>
-          <button class="ghost">Learn more</button>
+        <div class="hero-text">
+          <p class="eyebrow reveal">{eyebrow}</p>
+          <h1 class="reveal">{name}</h1>
+          <p class="tagline reveal">{tagline}</p>
+          <div class="actions reveal">
+            <button class="primary" type="button">{cta_primary}</button>
+            <button class="secondary" type="button">{cta_secondary}</button>
+          </div>
+          <div class="meta reveal">
+            <div>
+              <span class="label">Hours</span>
+              <span class="value">{hours}</span>
+            </div>
+            <div>
+              <span class="label">Find us</span>
+              <span class="value">{location}</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-visual reveal">
+          <div class="stack">
+{shelf_cards}
+          </div>
+          <div class="badge">{badge_text}</div>
         </div>
       </header>
-      <section class="grid">
-        <article>
-          <h2>Focus</h2>
-          <p>Clear structure, bold typography, and a single narrative.</p>
-        </article>
-        <article>
-          <h2>Experience</h2>
-          <p>Snappy layout, purposeful spacing, and scalable sections.</p>
-        </article>
-        <article>
-          <h2>Output</h2>
-          <p>Project-ready HTML/CSS with a light JS scaffold.</p>
-        </article>
+
+      <section class="highlights">
+        <div class="section-title">
+          <p class="eyebrow">{highlights_eyebrow}</p>
+          <h2>{highlights_title}</h2>
+        </div>
+        <div class="cards">
+{highlight_cards}
+        </div>
       </section>
+
+      <section class="events">
+        <div class="section-title">
+          <p class="eyebrow">{events_eyebrow}</p>
+          <h2>{events_title}</h2>
+        </div>
+        <div class="event-list">
+{event_rows}
+        </div>
+      </section>
+
+      <section class="membership">
+        <div class="membership-card reveal">
+          <h2>{membership_title}</h2>
+          <p>{membership_body}</p>
+          <button class="primary" type="button">{membership_cta}</button>
+        </div>
+        <div class="membership-note reveal">
+          <p>{footer_note}</p>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <p>{footer_note}</p>
+      </footer>
     </main>
     <script src="script.js"></script>
   </body>
 </html>
 """,
-        "styles.css": """* {
+        "styles.css": """:root {
+  --paper: #f7efe6;
+  --ink: #2a1d14;
+  --ink-soft: #5a4536;
+  --accent: #d27e5a;
+  --accent-2: #7aa18c;
+  --accent-3: #b58b62;
+  --surface: #fffaf2;
+  --shadow: 0 24px 60px rgba(37, 26, 19, 0.18);
+}
+
+* {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
 body {
-  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
-  background: radial-gradient(circle at top, #f9fafb, #e5e7eb);
-  color: #111827;
+  font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
+  background: var(--paper);
+  color: var(--ink);
   min-height: 100vh;
 }
 
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(600px 480px at 10% 5%, rgba(210, 126, 90, 0.35), transparent 60%),
+    radial-gradient(520px 440px at 90% 0%, rgba(122, 161, 140, 0.28), transparent 60%),
+    repeating-linear-gradient(
+      0deg,
+      rgba(42, 29, 20, 0.06),
+      rgba(42, 29, 20, 0.06) 1px,
+      transparent 1px,
+      transparent 6px
+    );
+  pointer-events: none;
+  z-index: -2;
+}
+
+.background {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 250, 242, 0.9), rgba(210, 126, 90, 0.3));
+  opacity: 0.65;
+  animation: float 12s ease-in-out infinite;
+}
+
+.orb-one {
+  width: 280px;
+  height: 280px;
+  top: -80px;
+  left: -40px;
+}
+
+.orb-two {
+  width: 220px;
+  height: 220px;
+  right: 10%;
+  top: 80px;
+  animation-delay: 1s;
+}
+
+.orb-three {
+  width: 320px;
+  height: 320px;
+  right: -120px;
+  bottom: -80px;
+  animation-delay: 2s;
+}
+
 .page {
-  max-width: 980px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 72px 24px;
+  padding: 80px 24px 96px;
   display: flex;
   flex-direction: column;
-  gap: 48px;
+  gap: 64px;
 }
 
 .hero {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 48px;
+  align-items: center;
+}
+
+.hero-text {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
 .eyebrow {
   text-transform: uppercase;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.25em;
   font-size: 12px;
-  color: #6b7280;
+  color: var(--ink-soft);
+}
+
+h1,
+h2 {
+  font-family: "Fraunces", "Times New Roman", serif;
+  letter-spacing: -0.02em;
 }
 
 h1 {
-  font-size: clamp(2.5rem, 6vw, 4rem);
-  font-weight: 700;
+  font-size: clamp(2.6rem, 6vw, 4.3rem);
 }
 
-.subtitle {
+.tagline {
   font-size: 1.1rem;
-  color: #374151;
+  color: var(--ink-soft);
   max-width: 60ch;
 }
 
 .actions {
   display: flex;
   gap: 16px;
-  margin-top: 12px;
+  flex-wrap: wrap;
 }
 
 button {
   border: none;
-  padding: 12px 20px;
+  padding: 12px 22px;
   border-radius: 999px;
   font-weight: 600;
   cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(37, 26, 19, 0.18);
 }
 
 .primary {
-  background: #111827;
-  color: #f9fafb;
+  background: var(--ink);
+  color: #fff4e8;
 }
 
-.ghost {
+.secondary {
   background: transparent;
-  border: 1px solid #9ca3af;
-  color: #111827;
+  border: 1px solid var(--ink);
+  color: var(--ink);
 }
 
-.grid {
+.meta {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  font-size: 0.95rem;
+}
+
+.meta .label {
+  display: block;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--ink-soft);
+}
+
+.meta .value {
+  font-weight: 600;
+}
+
+.hero-visual {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.stack {
+  display: grid;
+  gap: 16px;
+  width: min(100%, 420px);
+}
+
+.book {
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 18px 20px;
+  border-left: 6px solid var(--accent);
+  box-shadow: var(--shadow);
+}
+
+.book-2 {
+  border-left-color: var(--accent-2);
+}
+
+.book-3 {
+  border-left-color: var(--accent-3);
+}
+
+.book-title {
+  display: block;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.book-subtitle {
+  display: block;
+  color: var(--ink-soft);
+  margin-top: 6px;
+  font-size: 0.9rem;
+}
+
+.badge {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(42, 29, 20, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.65rem;
+  color: var(--ink-soft);
+}
+
+.highlights,
+.events {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.section-title h2 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+}
+
+.cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 24px;
 }
 
-.grid article {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+.card {
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 22px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card h3 {
+  font-size: 1.2rem;
+}
+
+.card p {
+  color: var(--ink-soft);
+}
+
+.event-list {
+  display: grid;
+  gap: 16px;
+}
+
+.event {
+  display: grid;
+  grid-template-columns: 86px 1fr;
+  gap: 16px;
+  align-items: center;
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 16px 20px;
+  box-shadow: var(--shadow);
+}
+
+.event-date {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  color: var(--ink-soft);
+}
+
+.event-info h3 {
+  font-size: 1.1rem;
+}
+
+.event-info p {
+  color: var(--ink-soft);
+  margin-top: 4px;
+}
+
+.membership {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  background: #23170f;
+  color: #f9efe4;
+  border-radius: 26px;
+  padding: 32px;
+}
+
+.membership-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.membership-card button {
+  align-self: flex-start;
+  background: #f9efe4;
+  color: #23170f;
+}
+
+.membership-note {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  color: rgba(249, 239, 228, 0.78);
+}
+
+.footer {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.is-ready .reveal {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(12px);
+  }
+}
+
+@media (max-width: 720px) {
+  .page {
+    padding: 64px 20px 80px;
+  }
+
+  .event {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 """,
-        "script.js": """document.querySelectorAll("button").forEach((button) => {
-  button.addEventListener("click", () => {
-    button.textContent = "Queued";
-  });
+        "script.js": """document.addEventListener("DOMContentLoaded", () => {
+  document.documentElement.classList.add("is-ready");
 });
 """,
         "README.md": _readme_text(objective, task, research),
     }
+
+
+def _default_landing_page_spec(objective: str) -> dict[str, Any]:
+    lowered = objective.lower()
+    if "book" in lowered or "bookstore" in lowered or "library" in lowered:
+        return {
+            "name": "Hearth & Hallow Books",
+            "eyebrow": "Indie Bookstore",
+            "tagline": "Slow shelves, bright stories, and handpicked reads for the neighborhood.",
+            "cta_primary": "Visit the shop",
+            "cta_secondary": "See events",
+            "hours": "Tue-Sun 10am-7pm",
+            "location": "214 River St, Cedar Alley",
+            "footer_note": "Independent, locally owned, and curated weekly.",
+            "highlights": [
+                {
+                    "title": "Staff Picks Wall",
+                    "body": "Fresh notes, local voices, and unexpected gems every week.",
+                },
+                {
+                    "title": "Reading Nooks",
+                    "body": "Warm light, quiet corners, and a rotating poetry shelf.",
+                },
+                {
+                    "title": "Community Shelf",
+                    "body": "Trade a book, leave a note, take a story.",
+                },
+            ],
+            "events": [
+                {
+                    "date": "Thu 7 PM",
+                    "title": "Poetry Night",
+                    "detail": "Open mic with neighborhood writers.",
+                },
+                {
+                    "date": "Sat 11 AM",
+                    "title": "Kids Story Hour",
+                    "detail": "Pillow fort and picture books.",
+                },
+                {
+                    "date": "Sun 4 PM",
+                    "title": "Debut Club",
+                    "detail": "First novels and fresh voices.",
+                },
+            ],
+            "membership": {
+                "title": "Join the Night Owl Club",
+                "body": "Members get early holds, quiet hours, and handwritten recs.",
+                "cta": "Get the card",
+            },
+            "shelf": [
+                {"title": "New Arrivals", "subtitle": "Fiction, essays, graphic"},
+                {"title": "Staff Notes", "subtitle": "Handwritten tags + smiles"},
+                {"title": "Local Authors", "subtitle": "Signed copies weekly"},
+            ],
+        }
+    title = _title_from_objective(objective)
+    if not title or "landing page" in lowered or lowered.startswith("create"):
+        title = "Northwind Studio"
+    return {
+        "name": title,
+        "eyebrow": "Independent Studio",
+        "tagline": "Small team, careful craft, and a focused release every season.",
+        "cta_primary": "Start a project",
+        "cta_secondary": "See the work",
+        "hours": "Mon-Fri 9am-6pm",
+        "location": "Remote + studio visits",
+        "footer_note": "Built for long-term partners.",
+        "highlights": [
+            {
+                "title": "Creative Direction",
+                "body": "Brand, tone, and narrative shaped in tight sprints.",
+            },
+            {
+                "title": "Design Systems",
+                "body": "Modular components with a calm, confident rhythm.",
+            },
+            {
+                "title": "Launch Support",
+                "body": "Clean handoff, production readiness, and QA.",
+            },
+        ],
+        "events": [
+            {
+                "date": "Wed 10 AM",
+                "title": "Open Studio",
+                "detail": "Drop in for feedback and coffee.",
+            },
+            {
+                "date": "Fri 1 PM",
+                "title": "Process Talk",
+                "detail": "Case study on a recent build.",
+            },
+            {
+                "date": "Monthly",
+                "title": "Partner Roundtable",
+                "detail": "Shared wins and roadmap reviews.",
+            },
+        ],
+        "membership": {
+            "title": "Stay in the loop",
+            "body": "Monthly notes with updates, releases, and new openings.",
+            "cta": "Join the list",
+        },
+        "shelf": [
+            {"title": "Current Work", "subtitle": "Web, brand, motion"},
+            {"title": "Research", "subtitle": "Trends and case studies"},
+            {"title": "Studio Notes", "subtitle": "Behind the scenes"},
+        ],
+    }
+
+
+def _normalize_landing_spec(objective: str, override: dict[str, Any] | None) -> dict[str, Any]:
+    base = _default_landing_page_spec(objective)
+    if not override:
+        return base
+    spec = dict(base)
+    for key in [
+        "name",
+        "eyebrow",
+        "tagline",
+        "cta_primary",
+        "cta_secondary",
+        "hours",
+        "location",
+        "footer_note",
+    ]:
+        if key in override:
+            spec[key] = _clean_text(override.get(key), spec[key])
+    if isinstance(override.get("membership"), dict):
+        membership = dict(base["membership"])
+        for key in ["title", "body", "cta"]:
+            membership[key] = _clean_text(override["membership"].get(key), membership[key])
+        spec["membership"] = membership
+    spec["highlights"] = _merge_list(base["highlights"], override.get("highlights"), ["title", "body"])
+    spec["events"] = _merge_list(base["events"], override.get("events"), ["date", "title", "detail"])
+    spec["shelf"] = _merge_list(base["shelf"], override.get("shelf"), ["title", "subtitle"])
+    return spec
+
+
+def _merge_list(
+    defaults: list[dict[str, str]],
+    override: Any,
+    keys: list[str],
+) -> list[dict[str, str]]:
+    merged: list[dict[str, str]] = []
+    for index, base in enumerate(defaults):
+        current = dict(base)
+        if isinstance(override, list) and index < len(override) and isinstance(override[index], dict):
+            source = override[index]
+            for key in keys:
+                current[key] = _clean_text(source.get(key), current[key])
+        merged.append(current)
+    return merged
+
+
+def _clean_text(value: Any, fallback: str) -> str:
+    if not isinstance(value, str):
+        return fallback
+    cleaned = _ascii_sanitize(value)
+    cleaned = " ".join(cleaned.split())
+    return cleaned or fallback
+
+
+def _ascii_sanitize(value: str) -> str:
+    replacements = {
+        "\u2018": "'",
+        "\u2019": "'",
+        "\u201c": '"',
+        "\u201d": '"',
+        "\u2014": "--",
+        "\u2013": "-",
+    }
+    for src, target in replacements.items():
+        value = value.replace(src, target)
+    return value.encode("ascii", "ignore").decode("ascii")
+
+
+def _extract_json(text: str) -> dict[str, Any] | None:
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+    start = text.find("{")
+    end = text.rfind("}")
+    if start == -1 or end == -1 or end <= start:
+        return None
+    try:
+        return json.loads(text[start : end + 1])
+    except json.JSONDecodeError:
+        return None
+
+
+def _escape(value: str) -> str:
+    return html.escape(value, quote=True)
 
 
 def _animation_project(

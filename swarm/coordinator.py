@@ -14,6 +14,7 @@ from swarm.agents import (
     BaseAgent,
     CoderAgent,
     CriticAgent,
+    DispatcherAgent,
     PlannerAgent,
     ResearcherAgent,
 )
@@ -110,9 +111,13 @@ class Coordinator:
         context = self._context(run_id, objective, resolved_output, dry_run, verbose)
         planner = self.agents["planner"]
         plan_output = await planner.run(objective, context)
-        plan = plan_output.get("plan", {})
+        plan_payload = plan_output.get("plan", {})
+        if isinstance(plan_payload, dict) and "plan" in plan_payload:
+            plan = plan_payload.get("plan", {})
+        else:
+            plan = plan_payload if isinstance(plan_payload, dict) else {}
         self.event_log.log("plan_created", {"run_id": run_id, "plan": plan})
-        self.persistent.put_message(run_id, planner.name, planner.role, json.dumps(plan), created_at)
+        self.persistent.put_message(run_id, planner.name, planner.role, json.dumps(plan_payload), created_at)
 
         steps = plan.get("steps", [])
         limit = max_steps or self.config.max_steps

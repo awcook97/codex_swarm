@@ -17,8 +17,13 @@ class HttpTool:
     def __init__(self, user_agent: str = "SwarmHttpTool/1.0") -> None:
         self._user_agent = user_agent
 
-    def get(self, url: str, timeout: float = 5.0) -> HttpResponse:
-        req = Request(url, headers={"User-Agent": self._user_agent})
+    def get(
+        self, url: str, timeout: float = 5.0, headers: dict[str, str] | None = None
+    ) -> HttpResponse:
+        request_headers = {"User-Agent": self._user_agent}
+        if headers:
+            request_headers.update(headers)
+        req = Request(url, headers=request_headers)
         try:
             with urlopen(req, timeout=timeout) as response:
                 body = response.read().decode("utf-8", errors="replace")
@@ -34,15 +39,23 @@ class HttpTool:
         except URLError as exc:
             return HttpResponse(url=url, status=0, text=str(exc))
 
-    def post(self, url: str, payload: dict, timeout: float = 10.0) -> HttpResponse:
+    def post(
+        self,
+        url: str,
+        payload: dict,
+        timeout: float = 10.0,
+        headers: dict[str, str] | None = None,
+    ) -> HttpResponse:
         """POST JSON payload to `url` and return an HttpResponse.
 
         Errors are returned as HttpResponse objects with `status==0` for network errors
         or the HTTP status code for server responses.
         """
         data = json.dumps(payload).encode("utf-8")
-        headers = {"User-Agent": self._user_agent, "Content-Type": "application/json"}
-        req = Request(url, data=data, headers=headers)
+        request_headers = {"User-Agent": self._user_agent, "Content-Type": "application/json"}
+        if headers:
+            request_headers.update(headers)
+        req = Request(url, data=data, headers=request_headers)
         try:
             with urlopen(req, timeout=timeout) as response:
                 body = response.read().decode("utf-8", errors="replace")
