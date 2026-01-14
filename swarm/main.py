@@ -54,6 +54,12 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Max search results to include in research (default 5)",
     )
+    parser.add_argument(
+        "--search-max-queries",
+        type=int,
+        default=None,
+        help="Max search queries to run when researching (default 6)",
+    )
     return parser
 
 
@@ -87,6 +93,8 @@ def main() -> int:
         config.search_api_key = args.search_api_key
     if args.search_max_results is not None:
         config.search_max_results = args.search_max_results
+    if args.search_max_queries is not None:
+        config.search_max_queries = args.search_max_queries
     coordinator = Coordinator(config=config)
 
     result = asyncio.run(

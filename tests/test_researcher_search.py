@@ -33,11 +33,14 @@ def test_parse_duckduckgo_html_results():
     assert results[1]["url"] == "https://example.org"
 
 
-def test_build_search_queries_strips_web_terms():
-    queries = _build_search_queries("Design a landing page for a small indie bookstore.")
+def test_build_search_queries_includes_prompt_terms():
+    queries = _build_search_queries(
+        "Design a landing page for a small indie bookstore.", max_queries=5
+    )
     assert queries
-    assert "landing page" not in queries[0]
-    assert "bookstore" in queries[0]
+    joined = " ".join(queries)
+    assert "landing page" in joined
+    assert "bookstore" in joined
 
 
 def test_resolve_search_defaults_to_duckduckgo(monkeypatch):

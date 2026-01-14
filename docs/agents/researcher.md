@@ -18,9 +18,11 @@ Constraints:
 - Be explicit about assumptions and data sources.
 - Keep summaries short and actionable.
 - When HTTP is enabled, prefer web search results; fall back to Wikipedia only if search returns no results.
-- If the objective includes a website/landing page for a non-web domain, focus research on the domain and avoid web design guidance.
+- Avoid fixating on the deliverable format; include both domain and solution angles when they help solve the objective.
+- Favor breadth: cover multiple angles that help solve the objective (constraints, examples, risks, options) instead of repeating the prompt.
 
 Web search configuration:
 - CLI: `--search-provider`, `--search-endpoint`, `--search-api-key`, `--search-max-results`
+- Optional: `--search-max-queries` to cap how many different queries run per task.
 - Providers: `duckduckgo` (no API key, HTML scrape, default when no provider configured), `searxng`, `serper`, `serpapi`, `brave`, `bing`, `google` (alias)
-- Env vars: `SEARXNG_URL`, `SEARCH_ENDPOINT`, `SERPER_API_KEY`, `SERPAPI_API_KEY`, `BRAVE_API_KEY`, `BING_API_KEY`, `SEARCH_MAX_RESULTS`
+- Env vars: `SEARXNG_URL`, `SEARCH_ENDPOINT`, `SERPER_API_KEY`, `SERPAPI_API_KEY`, `BRAVE_API_KEY`, `BING_API_KEY`, `SEARCH_MAX_RESULTS`, `SEARCH_MAX_QUERIES`

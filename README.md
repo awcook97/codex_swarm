@@ -78,6 +78,8 @@ python -m swarm "draft a product brief" --enable-http --search-provider duckduck
 
 DuckDuckGo uses the public HTML results page (no API key) and may be rate limited.
 
+Use `--search-max-queries` or `SEARCH_MAX_QUERIES` to widen/narrow how many query variants are used.
+
 ```bash
 SERPER_API_KEY=... python -m swarm "draft a product brief" --enable-http --search-provider serper
 ```

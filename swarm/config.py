@@ -25,6 +25,7 @@ class SwarmConfig:
     search_endpoint: str | None = None
     search_api_key: str | None = None
     search_max_results: int = 5
+    search_max_queries: int = 6
     shell_allowlist: Sequence[str] = field(default_factory=lambda: ["ls", "rg", "cat"])
     filesystem_allowlist: Sequence[Path] = field(default_factory=list)
 

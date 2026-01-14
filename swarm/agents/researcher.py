@@ -43,8 +43,9 @@ class ResearcherAgent(BaseAgent):
         prompt_lines = [
             "ROLE: Researcher",
             "Return JSON with fields: summary, deliverable, needs.",
-            "Focus on the subject matter in the objective; avoid web design advice unless the objective is about web design.",
-            "If a website is requested, assume general web knowledge and research the domain instead.",
+            "Emphasize how to solve the objective: constraints, options, examples, risks, and decision points.",
+            "Prefer breadth over depth; cover multiple angles beyond the prompt wording.",
+            "Assume general implementation knowledge unless the objective explicitly requests technical research.",
             f"Objective: {context.objective}",
             f"Task: {task}",
         ]
@@ -82,8 +83,8 @@ class ResearcherAgent(BaseAgent):
 
         if summary is None:
             summary = (
-                "Research stub: No HTTP calls made. Provide domain-focused guidance and assumptions "
-                "based on the objective (avoid web design unless explicitly requested)."
+                "Research stub: No HTTP calls made. Provide solution-focused guidance and assumptions "
+                "based on the objective, covering multiple angles."
             )
             lowered = context.objective.lower()
             if "animation" in lowered or "movie" in lowered:
@@ -181,7 +182,8 @@ def _fetch_wikipedia_summary(http: Any, objective: str) -> tuple[str, list[str]]
 def _fetch_search_results(
     http: Any, objective: str, config: Any
 ) -> tuple[str, list[str], str | None]:
-    queries = _build_search_queries(objective)
+    max_queries = _search_max_queries(config)
+    queries = _build_search_queries(objective, max_queries)
     if not queries:
         return "", [], "Empty search query."
     provider, endpoint, api_key, max_results, error = _resolve_search_settings(config)
@@ -189,6 +191,7 @@ def _fetch_search_results(
         return "", [], error
     if provider is None:
         return "", [], "Search provider not configured."
+    grouped_results: list[tuple[str, list[dict[str, Any]]]] = []
     last_error = None
     for query in queries:
         results, search_error = _run_search_query(http, provider, query, endpoint, api_key)
@@ -196,28 +199,59 @@ def _fetch_search_results(
             last_error = search_error
             continue
         if results:
-            return _format_search_summary(provider, results, max_results)
+            grouped_results.append((query, results))
+    if grouped_results:
+        return _format_search_summary(provider, grouped_results, max_results)
     return "", [], last_error or "No results found."
 
 
-def _build_search_queries(objective: str) -> list[str]:
-    cleaned = _strip_web_terms(objective)
-    queries: list[str] = []
-    if cleaned:
-        queries.append(cleaned)
-    lowered = objective.lower()
-    if "bookstore" in lowered or "book shop" in lowered or "bookshop" in lowered or "book " in lowered:
-        queries.extend(
-            [
-                "independent bookstore community events",
-                "indie bookstore merchandising displays",
-                "bookstore reading nooks atmosphere",
-                "how independent bookstores build community",
-            ]
-        )
-    if not queries:
-        queries.append(objective.strip())
-    return _dedupe_queries(queries)
+def _build_search_queries(objective: str, max_queries: int) -> list[str]:
+    base = objective.strip()
+    if not base:
+        return []
+    core = _strip_action_words(base)
+    domain = _strip_web_terms(base)
+    queries: list[str] = [base]
+    if core and core != base:
+        queries.append(core)
+    if domain and domain not in {base, core}:
+        queries.append(domain)
+    expansions = _query_expansions()
+    subject = core or base
+    for expansion in expansions:
+        if subject:
+            queries.append(f"{subject} {expansion}")
+        if domain and domain != subject:
+            queries.append(f"{domain} {expansion}")
+    deduped = _dedupe_queries(queries)
+    return deduped[: max(1, max_queries)]
+
+
+def _query_expansions() -> list[str]:
+    return [
+        "overview",
+        "examples",
+        "case study",
+        "best practices",
+        "checklist",
+        "common mistakes",
+        "constraints",
+        "metrics",
+        "audience",
+        "strategy",
+    ]
+
+
+def _strip_action_words(value: str) -> str:
+    lowered = value.lower()
+    lowered = re.sub(
+        r"\\b(create|design|build|make|draft|write|develop|plan|generate|produce|craft)\\b",
+        " ",
+        lowered,
+    )
+    cleaned = re.sub(r"[^a-z0-9\\s-]+", " ", lowered)
+    cleaned = " ".join(cleaned.split())
+    return cleaned.strip()
 
 
 def _strip_web_terms(value: str) -> str:
@@ -459,6 +493,15 @@ def _search_max_results(config: Any) -> int:
     return max(1, min(value, 10))
 
 
+def _search_max_queries(config: Any) -> int:
+    raw = getattr(config, "search_max_queries", None) or os.getenv("SEARCH_MAX_QUERIES")
+    try:
+        value = int(raw) if raw is not None else 6
+    except (TypeError, ValueError):
+        value = 6
+    return max(1, min(value, 12))
+
+
 def _fetch_json(
     http: Any,
     url: str,
@@ -565,23 +608,60 @@ def _clean_duckduckgo_url(value: str) -> str:
     return value
 
 
+def _select_search_results(
+    grouped_results: list[tuple[str, list[dict[str, Any]]]], max_results: int
+) -> list[dict[str, Any]]:
+    if not grouped_results or max_results <= 0:
+        return []
+    group_count = len(grouped_results)
+    per_query = max_results // group_count
+    remainder = max_results % group_count
+    selected: list[dict[str, Any]] = []
+    total = 0
+    for index, (query, results) in enumerate(grouped_results):
+        limit = per_query + (1 if index < remainder else 0)
+        chunk = results[:limit] if limit > 0 else []
+        selected.append({"query": query, "results": chunk})
+        total += len(chunk)
+    remaining = max_results - total
+    if remaining > 0:
+        for index, item in enumerate(selected):
+            if remaining <= 0:
+                break
+            existing_count = len(item["results"])
+            extras = grouped_results[index][1][existing_count : existing_count + remaining]
+            if extras:
+                item["results"].extend(extras)
+                remaining -= len(extras)
+    return selected
+
+
 def _format_search_summary(
-    provider: str, results: list[dict[str, Any]], max_results: int
+    provider: str,
+    grouped_results: list[tuple[str, list[dict[str, Any]]]],
+    max_results: int,
 ) -> tuple[str, list[str], str | None]:
     lines = [f"Provider: {provider}"]
     references: list[str] = []
-    for item in results[:max_results]:
-        url = item.get("url")
-        if not isinstance(url, str) or not url:
-            continue
-        title = _clean_line(item.get("title") or url)
-        snippet = _clean_line(item.get("snippet") or "", limit=180)
-        domain = _domain_from_url(url)
-        if snippet:
-            lines.append(f"- {title} ({domain}) - {snippet}")
-        else:
-            lines.append(f"- {title} ({domain})")
-        references.append(url)
+    seen_urls: set[str] = set()
+    selected_groups = _select_search_results(grouped_results, max_results)
+    for group in selected_groups:
+        query = group.get("query", "")
+        if query:
+            lines.append(f"Query: {query}")
+        for item in group.get("results", []):
+            url = item.get("url")
+            if not isinstance(url, str) or not url or url in seen_urls:
+                continue
+            seen_urls.add(url)
+            title = _clean_line(item.get("title") or url)
+            snippet = _clean_line(item.get("snippet") or "", limit=180)
+            domain = _domain_from_url(url)
+            if snippet:
+                lines.append(f"- {title} ({domain}) - {snippet}")
+            else:
+                lines.append(f"- {title} ({domain})")
+            references.append(url)
     if len(lines) == 1:
         return "", [], "No results found."
     return "\n".join(lines), references, None
