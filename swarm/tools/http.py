@@ -38,6 +38,8 @@ class HttpTool:
             return HttpResponse(url=url, status=getattr(exc, "code", 0), text=body)
         except URLError as exc:
             return HttpResponse(url=url, status=0, text=str(exc))
+        except Exception as exc:
+            return HttpResponse(url=url, status=0, text=str(exc))
 
     def post(
         self,
@@ -68,4 +70,6 @@ class HttpTool:
                 body = str(exc)
             return HttpResponse(url=url, status=getattr(exc, "code", 0), text=body)
         except URLError as exc:
+            return HttpResponse(url=url, status=0, text=str(exc))
+        except Exception as exc:
             return HttpResponse(url=url, status=0, text=str(exc))

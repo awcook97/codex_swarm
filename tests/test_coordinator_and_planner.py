@@ -57,8 +57,9 @@ def test_planner_falls_back_on_invalid_json(tmp_path: Path) -> None:
     assert "plan" in result
     plan = result["plan"]
     assert isinstance(plan, dict)
-    assert "steps" in plan
-    assert any(s.get("agent") == "researcher" for s in plan.get("steps", []))
+    assert "plan" in plan
+    assert "steps" in plan["plan"]
+    assert any(s.get("agent") == "researcher" for s in plan["plan"].get("steps", []))
 
     persistent.close()
 

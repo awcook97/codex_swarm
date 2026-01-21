@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    />
+    <title>Feature Factory</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="hero">
+        <p class="eyebrow">Feature Factory Orchestrator</p>
+        <h1>Ship multiple features in parallel.</h1>
+        <p class="subhead">
+          Submit a batch spec, watch runs execute, and inspect results as they land.
+        </p>
+      </header>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Submit Batch</h2>
+          <button id="load-sample" type="button">Load Sample</button>
+        </div>
+        <textarea id="batch-input" spellcheck="false"></textarea>
+        <div class="panel-actions">
+          <button id="submit-batch" type="button">Submit Batch</button>
+          <span id="submit-status" class="muted"></span>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Recent Batches</h2>
+          <button id="refresh" type="button">Refresh</button>
+        </div>
+        <div id="batch-list" class="batch-list"></div>
+      </section>
+    </div>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "batch_id": "demo-batch-001",
+  "features": [
+    {
+      "feature_id": "feat-001",
+      "objective": "Add an onboarding tooltip to the dashboard."
+    },
+    {
+      "feature_id": "feat-002",
+      "objective": "Expose a status endpoint for release bundles."
+    }
+  ]
+}

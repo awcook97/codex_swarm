@@ -1,0 +1,1 @@
+"""Feature Factory sample project."""

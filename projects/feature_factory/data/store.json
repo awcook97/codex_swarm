@@ -1,0 +1,1578 @@
+{
+  "batches": {
+    "demo-batch-001": {
+      "batch_id": "demo-batch-001",
+      "created_at": "2026-01-21T18:25:33.456336+00:00",
+      "status": "failed",
+      "features": [
+        {
+          "feature_id": "feat-001",
+          "objective": "Add an onboarding tooltip to the dashboard.",
+          "status": "queued",
+          "run_id": null,
+          "output_dir": null,
+          "final": null,
+          "artifacts": []
+        },
+        {
+          "feature_id": "feat-002",
+          "objective": "Expose a status endpoint for release bundles.",
+          "status": "queued",
+          "run_id": null,
+          "output_dir": null,
+          "final": null,
+          "artifacts": []
+        }
+      ],
+      "error": "Object of type datetime is not JSON serializable"
+    },
+    "demo-batch-002": {
+      "batch_id": "demo-batch-002",
+      "created_at": "2026-01-21T18:27:16.491245+00:00",
+      "status": "completed",
+      "features": [
+        {
+          "feature_id": "feat-001",
+          "objective": "Add an onboarding tooltip to the dashboard.",
+          "status": "completed",
+          "run_id": "feat-001",
+          "output_dir": "/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard",
+          "final": "researcher: {'summary': 'Provide general guidance and assumptions based on the objective.', 'deliverable': 'html', 'needs': [], 'files': ['/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/research.md', '/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/handoff.json']}\nCritic note: Missing primary deliverable; include a GIF/video or HTML entrypoint.\nindex.html\nstyles.css\nscript.js\nREADME.md",
+          "artifacts": []
+        },
+        {
+          "feature_id": "feat-002",
+          "objective": "Expose a status endpoint for release bundles.",
+          "status": "completed",
+          "run_id": "feat-002",
+          "output_dir": "/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles",
+          "final": "researcher: {'summary': 'Provide general guidance and assumptions based on the objective.', 'deliverable': 'html', 'needs': [], 'files': ['/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/research.md', '/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/handoff.json']}\nCritic note: Missing primary deliverable; include a GIF/video or HTML entrypoint.\nindex.html\nstyles.css\nscript.js\nREADME.md",
+          "artifacts": []
+        }
+      ],
+      "results": [
+        {
+          "run_id": "feat-001",
+          "objective": "Add an onboarding tooltip to the dashboard.",
+          "final": "researcher: {'summary': 'Provide general guidance and assumptions based on the objective.', 'deliverable': 'html', 'needs': [], 'files': ['/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/research.md', '/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/handoff.json']}\nCritic note: Missing primary deliverable; include a GIF/video or HTML entrypoint.\nindex.html\nstyles.css\nscript.js\nREADME.md",
+          "output_dir": "/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard",
+          "events": [
+            {
+              "timestamp": "2026-01-21 18:27:16.510852+00:00",
+              "event_type": "run_started",
+              "payload": {
+                "run_id": "feat-001",
+                "objective": "Add an onboarding tooltip to the dashboard."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.510889+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "planner",
+                "role": "Planner",
+                "message": "Planning for objective: Add an onboarding tooltip to the dashboard."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.510897+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "planner",
+                "role": "Planner",
+                "prompt": "ROLE: Planner\nReturn JSON with fields: plan, deliverable, project_type, artifacts.\nplan must include steps with (id, agent, task, depends_on).\nObjective: Add an onboarding tooltip to the dashboard."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.510990+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "planner",
+                "role": "Planner",
+                "response": "{\n  \"steps\": [\n    {\n      \"id\": 1,\n      \"agent\": \"researcher\",\n      \"task\": \"Gather relevant context for the objective.\",\n      \"depends_on\": []\n    },\n    {\n      \"id\": 2,\n      \"agent\": \"coder\",\n      \"task\": \"Draft an output artifact based on the research.\",\n      \"depends_on\": [\n        1\n      ]\n    },\n    {\n      \"id\": 3,\n      \"agent\": \"critic\",\n      \"task\": \"Review the drafted output for completeness and clarity.\",\n      \"depends_on\": [\n        2\n      ]\n    }\n  ],\n  \"seed\": 42\n}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.511474+00:00",
+              "event_type": "plan_created",
+              "payload": {
+                "run_id": "feat-001",
+                "plan": {
+                  "steps": [
+                    {
+                      "id": 1,
+                      "agent": "researcher",
+                      "task": "Gather context.",
+                      "depends_on": []
+                    },
+                    {
+                      "id": 2,
+                      "agent": "coder",
+                      "task": "Draft a response.",
+                      "depends_on": [
+                        1
+                      ]
+                    },
+                    {
+                      "id": 3,
+                      "agent": "critic",
+                      "task": "Review the draft.",
+                      "depends_on": [
+                        2
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.536383+00:00",
+              "event_type": "step_started",
+              "payload": {
+                "step_id": 1,
+                "agent": "researcher"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.536399+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "message": "Starting research task: Gather context."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.536411+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "prompt": "ROLE: Researcher\nReturn JSON with fields: summary, deliverable, needs.\nEmphasize how to solve the objective: constraints, options, examples, risks, and decision points.\nPrefer breadth over depth; cover multiple angles beyond the prompt wording.\nAssume general implementation knowledge unless the objective explicitly requests technical research.\nObjective: Add an onboarding tooltip to the dashboard.\nTask: Gather context."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.536471+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "response": "{\"summary\": \"Provide general guidance and assumptions based on the objective.\", \"deliverable\": \"html\", \"needs\": []}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.541457+00:00",
+              "event_type": "step_completed",
+              "payload": {
+                "step_id": 1,
+                "agent": "researcher"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.541537+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "message": "Reviewing output: {\"step_id\": 1, \"agent\": \"researcher\", \"output\": {\"summary\": \"Provide general guidance and assumptions based on the objective.\", \"deliverable\": \"html\", \"needs\": [], \"files\": [\"/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/research.md\", \"/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/handoff.json\"]}}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.541602+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "prompt": "ROLE: Critic\nReturn JSON with fields: approved, notes.\nObjective: Add an onboarding tooltip to the dashboard.\nFiles: ['/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/research.md', '/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/handoff.json']\nOutput summary: "
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.541639+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "response": "{\"approved\": true, \"notes\": \"Looks good.\"}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.542315+00:00",
+              "event_type": "critic_review",
+              "payload": {
+                "step_id": 1,
+                "approved": false
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.542342+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "message": "Starting research task: Gather context.\n\nCritic feedback: Missing primary deliverable; include a GIF/video or HTML entrypoint."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.542351+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "prompt": "ROLE: Researcher\nReturn JSON with fields: summary, deliverable, needs.\nEmphasize how to solve the objective: constraints, options, examples, risks, and decision points.\nPrefer breadth over depth; cover multiple angles beyond the prompt wording.\nAssume general implementation knowledge unless the objective explicitly requests technical research.\nObjective: Add an onboarding tooltip to the dashboard.\nTask: Gather context.\n\nCritic feedback: Missing primary deliverable; include a GIF/video or HTML entrypoint."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.542402+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "response": "{\"summary\": \"Provide general guidance and assumptions based on the objective.\", \"deliverable\": \"html\", \"needs\": []}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.546920+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "message": "Reviewing output: {\"step_id\": 1, \"agent\": \"researcher\", \"output\": {\"summary\": \"Provide general guidance and assumptions based on the objective.\", \"deliverable\": \"html\", \"needs\": [], \"files\": [\"/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/research.md\", \"/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/handoff.json\"]}}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.546977+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "prompt": "ROLE: Critic\nReturn JSON with fields: approved, notes.\nObjective: Add an onboarding tooltip to the dashboard.\nFiles: ['/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/research.md', '/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/handoff.json']\nOutput summary: "
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.547005+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "response": "{\"approved\": true, \"notes\": \"Looks good.\"}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.547641+00:00",
+              "event_type": "critic_review",
+              "payload": {
+                "step_id": 1,
+                "approved": false
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.559538+00:00",
+              "event_type": "step_started",
+              "payload": {
+                "step_id": 2,
+                "agent": "coder"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.559547+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "coder",
+                "role": "Coder",
+                "message": "Coding task: Draft a response."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.560627+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "coder",
+                "role": "Coder",
+                "prompt": "ROLE: Coder\nReturn strict JSON only. No markdown.\nUse ASCII characters only.\nCreate copy for a single-page landing page.\nFields: name, eyebrow, tagline, cta_primary, cta_secondary, hours, location, footer_note.\nhighlights: array of 3 objects with title, body.\nevents: array of 3 objects with date, title, detail.\nmembership: object with title, body, cta.\nshelf: array of 3 objects with title, subtitle.\nObjective: Add an onboarding tooltip to the dashboard.\nTask: Draft a response.\nResearch: Provide general guidance and assumptions based on the objective."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.560683+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "coder",
+                "role": "Coder",
+                "response": "{\"deliverable\": \"html\", \"subject\": \"add an onboarding tooltip to the dashboard.\", \"project_type\": \"landing_page\"}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.570993+00:00",
+              "event_type": "step_completed",
+              "payload": {
+                "step_id": 2,
+                "agent": "coder"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.571043+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "message": "Reviewing output: {\"step_id\": 2, \"agent\": \"coder\", \"output\": {\"artifact\": \"/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard\", \"files\": [\"index.html\", \"styles.css\", \"script.js\", \"README.md\"], \"content\": \"index.html\\nstyles.css\\nscript.js\\nREADME.md\", \"needs\": [], \"deliverable\": \"html\", \"manifest\": \"/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/artifact_manifest.json\"}}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.571087+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "prompt": "ROLE: Critic\nReturn JSON with fields: approved, notes.\nObjective: Add an onboarding tooltip to the dashboard.\nFiles: ['index.html', 'styles.css', 'script.js', 'README.md']\nOutput summary: index.html\nstyles.css\nscript.js\nREADME.md"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.571112+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "response": "{\"approved\": true, \"notes\": \"Looks good.\"}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.572080+00:00",
+              "event_type": "critic_review",
+              "payload": {
+                "step_id": 2,
+                "approved": true
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.584101+00:00",
+              "event_type": "run_completed",
+              "payload": {
+                "run_id": "feat-001",
+                "final": "researcher: {'summary': 'Provide general guidance and assumptions based on the objective.', 'deliverable': 'html', 'needs': [], 'files': ['/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/research.md', '/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/handoff.json']}\nCritic note: Missing primary deliverable; include a GIF/video or HTML entrypoint.\nindex.html\nstyles.css\nscript.js\nREADME.md"
+              }
+            }
+          ]
+        },
+        {
+          "run_id": "feat-002",
+          "objective": "Expose a status endpoint for release bundles.",
+          "final": "researcher: {'summary': 'Provide general guidance and assumptions based on the objective.', 'deliverable': 'html', 'needs': [], 'files': ['/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/research.md', '/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/handoff.json']}\nCritic note: Missing primary deliverable; include a GIF/video or HTML entrypoint.\nindex.html\nstyles.css\nscript.js\nREADME.md",
+          "output_dir": "/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles",
+          "events": [
+            {
+              "timestamp": "2026-01-21 18:27:16.531131+00:00",
+              "event_type": "run_started",
+              "payload": {
+                "run_id": "feat-002",
+                "objective": "Expose a status endpoint for release bundles."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.531194+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "planner",
+                "role": "Planner",
+                "message": "Planning for objective: Expose a status endpoint for release bundles."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.531205+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "planner",
+                "role": "Planner",
+                "prompt": "ROLE: Planner\nReturn JSON with fields: plan, deliverable, project_type, artifacts.\nplan must include steps with (id, agent, task, depends_on).\nObjective: Expose a status endpoint for release bundles."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.531350+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "planner",
+                "role": "Planner",
+                "response": "{\n  \"steps\": [\n    {\n      \"id\": 1,\n      \"agent\": \"researcher\",\n      \"task\": \"Gather relevant context for the objective.\",\n      \"depends_on\": []\n    },\n    {\n      \"id\": 2,\n      \"agent\": \"coder\",\n      \"task\": \"Draft an output artifact based on the research.\",\n      \"depends_on\": [\n        1\n      ]\n    },\n    {\n      \"id\": 3,\n      \"agent\": \"critic\",\n      \"task\": \"Review the drafted output for completeness and clarity.\",\n      \"depends_on\": [\n        2\n      ]\n    }\n  ],\n  \"seed\": 42\n}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.532704+00:00",
+              "event_type": "plan_created",
+              "payload": {
+                "run_id": "feat-002",
+                "plan": {
+                  "steps": [
+                    {
+                      "id": 1,
+                      "agent": "researcher",
+                      "task": "Gather context.",
+                      "depends_on": []
+                    },
+                    {
+                      "id": 2,
+                      "agent": "coder",
+                      "task": "Draft a response.",
+                      "depends_on": [
+                        1
+                      ]
+                    },
+                    {
+                      "id": 3,
+                      "agent": "critic",
+                      "task": "Review the draft.",
+                      "depends_on": [
+                        2
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.547699+00:00",
+              "event_type": "step_started",
+              "payload": {
+                "step_id": 1,
+                "agent": "researcher"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.547706+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "message": "Starting research task: Gather context."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.547714+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "prompt": "ROLE: Researcher\nReturn JSON with fields: summary, deliverable, needs.\nEmphasize how to solve the objective: constraints, options, examples, risks, and decision points.\nPrefer breadth over depth; cover multiple angles beyond the prompt wording.\nAssume general implementation knowledge unless the objective explicitly requests technical research.\nObjective: Expose a status endpoint for release bundles.\nTask: Gather context."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.547760+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "response": "{\"summary\": \"Provide general guidance and assumptions based on the objective.\", \"deliverable\": \"html\", \"needs\": []}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.553311+00:00",
+              "event_type": "step_completed",
+              "payload": {
+                "step_id": 1,
+                "agent": "researcher"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.553360+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "message": "Reviewing output: {\"step_id\": 1, \"agent\": \"researcher\", \"output\": {\"summary\": \"Provide general guidance and assumptions based on the objective.\", \"deliverable\": \"html\", \"needs\": [], \"files\": [\"/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/research.md\", \"/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/handoff.json\"]}}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.553396+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "prompt": "ROLE: Critic\nReturn JSON with fields: approved, notes.\nObjective: Expose a status endpoint for release bundles.\nFiles: ['/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/research.md', '/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/handoff.json']\nOutput summary: "
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.553420+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "response": "{\"approved\": true, \"notes\": \"Looks good.\"}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.554012+00:00",
+              "event_type": "critic_review",
+              "payload": {
+                "step_id": 1,
+                "approved": false
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.554023+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "message": "Starting research task: Gather context.\n\nCritic feedback: Missing primary deliverable; include a GIF/video or HTML entrypoint."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.554044+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "prompt": "ROLE: Researcher\nReturn JSON with fields: summary, deliverable, needs.\nEmphasize how to solve the objective: constraints, options, examples, risks, and decision points.\nPrefer breadth over depth; cover multiple angles beyond the prompt wording.\nAssume general implementation knowledge unless the objective explicitly requests technical research.\nObjective: Expose a status endpoint for release bundles.\nTask: Gather context.\n\nCritic feedback: Missing primary deliverable; include a GIF/video or HTML entrypoint."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.554090+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "response": "{\"summary\": \"Provide general guidance and assumptions based on the objective.\", \"deliverable\": \"html\", \"needs\": []}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.558624+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "message": "Reviewing output: {\"step_id\": 1, \"agent\": \"researcher\", \"output\": {\"summary\": \"Provide general guidance and assumptions based on the objective.\", \"deliverable\": \"html\", \"needs\": [], \"files\": [\"/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/research.md\", \"/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/handoff.json\"]}}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.558666+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "prompt": "ROLE: Critic\nReturn JSON with fields: approved, notes.\nObjective: Expose a status endpoint for release bundles.\nFiles: ['/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/research.md', '/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/handoff.json']\nOutput summary: "
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.558692+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "response": "{\"approved\": true, \"notes\": \"Looks good.\"}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.559307+00:00",
+              "event_type": "critic_review",
+              "payload": {
+                "step_id": 1,
+                "approved": false
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.572128+00:00",
+              "event_type": "step_started",
+              "payload": {
+                "step_id": 2,
+                "agent": "coder"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.572155+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "coder",
+                "role": "Coder",
+                "message": "Coding task: Draft a response."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.573127+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "coder",
+                "role": "Coder",
+                "prompt": "ROLE: Coder\nReturn strict JSON only. No markdown.\nUse ASCII characters only.\nCreate copy for a single-page landing page.\nFields: name, eyebrow, tagline, cta_primary, cta_secondary, hours, location, footer_note.\nhighlights: array of 3 objects with title, body.\nevents: array of 3 objects with date, title, detail.\nmembership: object with title, body, cta.\nshelf: array of 3 objects with title, subtitle.\nObjective: Expose a status endpoint for release bundles.\nTask: Draft a response.\nResearch: Provide general guidance and assumptions based on the objective."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.573199+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "coder",
+                "role": "Coder",
+                "response": "{\"deliverable\": \"html\", \"subject\": \"expose a status endpoint for release bundles.\", \"project_type\": \"landing_page\"}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.582960+00:00",
+              "event_type": "step_completed",
+              "payload": {
+                "step_id": 2,
+                "agent": "coder"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.583005+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "message": "Reviewing output: {\"step_id\": 2, \"agent\": \"coder\", \"output\": {\"artifact\": \"/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles\", \"files\": [\"index.html\", \"styles.css\", \"script.js\", \"README.md\"], \"content\": \"index.html\\nstyles.css\\nscript.js\\nREADME.md\", \"needs\": [], \"deliverable\": \"html\", \"manifest\": \"/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/artifact_manifest.json\"}}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.583049+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "prompt": "ROLE: Critic\nReturn JSON with fields: approved, notes.\nObjective: Expose a status endpoint for release bundles.\nFiles: ['index.html', 'styles.css', 'script.js', 'README.md']\nOutput summary: index.html\nstyles.css\nscript.js\nREADME.md"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.583074+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "response": "{\"approved\": true, \"notes\": \"Looks good.\"}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.583963+00:00",
+              "event_type": "critic_review",
+              "payload": {
+                "step_id": 2,
+                "approved": true
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:27:16.584222+00:00",
+              "event_type": "run_completed",
+              "payload": {
+                "run_id": "feat-002",
+                "final": "researcher: {'summary': 'Provide general guidance and assumptions based on the objective.', 'deliverable': 'html', 'needs': [], 'files': ['/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/research.md', '/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/handoff.json']}\nCritic note: Missing primary deliverable; include a GIF/video or HTML entrypoint.\nindex.html\nstyles.css\nscript.js\nREADME.md"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "demo-batch-003": {
+      "batch_id": "demo-batch-003",
+      "created_at": "2026-01-21T18:29:48.625259+00:00",
+      "status": "completed",
+      "features": [
+        {
+          "feature_id": "feat-001",
+          "objective": "Add an onboarding tooltip to the dashboard.",
+          "status": "completed",
+          "run_id": "feat-001",
+          "output_dir": "/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard",
+          "final": "researcher: {'summary': 'Provide general guidance and assumptions based on the objective.', 'deliverable': 'html', 'needs': [], 'files': ['/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/research.md', '/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/handoff.json']}\nCritic note: Missing primary deliverable; include a GIF/video or HTML entrypoint.\nindex.html\nstyles.css\nscript.js\nREADME.md",
+          "artifacts": []
+        },
+        {
+          "feature_id": "feat-002",
+          "objective": "Expose a status endpoint for release bundles.",
+          "status": "completed",
+          "run_id": "feat-002",
+          "output_dir": "/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles",
+          "final": "researcher: {'summary': 'Provide general guidance and assumptions based on the objective.', 'deliverable': 'html', 'needs': [], 'files': ['/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/research.md', '/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/handoff.json']}\nCritic note: Missing primary deliverable; include a GIF/video or HTML entrypoint.\nindex.html\nstyles.css\nscript.js\nREADME.md",
+          "artifacts": []
+        },
+        {
+          "feature_id": "feat-003",
+          "objective": "Add a CLI command to list recent batches.",
+          "status": "completed",
+          "run_id": "feat-003",
+          "output_dir": "/home/andrew/projects/codex_swarm/output/add-a-cli-command-to-list-recent-batches",
+          "final": "researcher: {'summary': 'Provide general guidance and assumptions based on the objective.', 'deliverable': 'html', 'needs': [], 'files': ['/home/andrew/projects/codex_swarm/output/add-a-cli-command-to-list-recent-batches/research.md', '/home/andrew/projects/codex_swarm/output/add-a-cli-command-to-list-recent-batches/handoff.json']}\nCritic note: Missing primary deliverable; include a GIF/video or HTML entrypoint.\nindex.html\nstyles.css\nscript.js\nREADME.md",
+          "artifacts": []
+        }
+      ],
+      "results": [
+        {
+          "run_id": "feat-001",
+          "objective": "Add an onboarding tooltip to the dashboard.",
+          "final": "researcher: {'summary': 'Provide general guidance and assumptions based on the objective.', 'deliverable': 'html', 'needs': [], 'files': ['/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/research.md', '/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/handoff.json']}\nCritic note: Missing primary deliverable; include a GIF/video or HTML entrypoint.\nindex.html\nstyles.css\nscript.js\nREADME.md",
+          "output_dir": "/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard",
+          "events": [
+            {
+              "timestamp": "2026-01-21 18:29:48.636575+00:00",
+              "event_type": "run_started",
+              "payload": {
+                "run_id": "feat-001",
+                "objective": "Add an onboarding tooltip to the dashboard."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.636594+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "planner",
+                "role": "Planner",
+                "message": "Planning for objective: Add an onboarding tooltip to the dashboard."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.636599+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "planner",
+                "role": "Planner",
+                "prompt": "ROLE: Planner\nReturn JSON with fields: plan, deliverable, project_type, artifacts.\nplan must include steps with (id, agent, task, depends_on).\nObjective: Add an onboarding tooltip to the dashboard."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.636673+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "planner",
+                "role": "Planner",
+                "response": "{\n  \"steps\": [\n    {\n      \"id\": 1,\n      \"agent\": \"researcher\",\n      \"task\": \"Gather relevant context for the objective.\",\n      \"depends_on\": []\n    },\n    {\n      \"id\": 2,\n      \"agent\": \"coder\",\n      \"task\": \"Draft an output artifact based on the research.\",\n      \"depends_on\": [\n        1\n      ]\n    },\n    {\n      \"id\": 3,\n      \"agent\": \"critic\",\n      \"task\": \"Review the drafted output for completeness and clarity.\",\n      \"depends_on\": [\n        2\n      ]\n    }\n  ],\n  \"seed\": 42\n}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.636743+00:00",
+              "event_type": "plan_created",
+              "payload": {
+                "run_id": "feat-001",
+                "plan": {
+                  "steps": [
+                    {
+                      "id": 1,
+                      "agent": "researcher",
+                      "task": "Gather context.",
+                      "depends_on": []
+                    },
+                    {
+                      "id": 2,
+                      "agent": "coder",
+                      "task": "Draft a response.",
+                      "depends_on": [
+                        1
+                      ]
+                    },
+                    {
+                      "id": 3,
+                      "agent": "critic",
+                      "task": "Review the draft.",
+                      "depends_on": [
+                        2
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.654785+00:00",
+              "event_type": "step_started",
+              "payload": {
+                "step_id": 1,
+                "agent": "researcher"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.654790+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "message": "Starting research task: Gather context."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.654794+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "prompt": "ROLE: Researcher\nReturn JSON with fields: summary, deliverable, needs.\nEmphasize how to solve the objective: constraints, options, examples, risks, and decision points.\nPrefer breadth over depth; cover multiple angles beyond the prompt wording.\nAssume general implementation knowledge unless the objective explicitly requests technical research.\nObjective: Add an onboarding tooltip to the dashboard.\nTask: Gather context."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.654823+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "response": "{\"summary\": \"Provide general guidance and assumptions based on the objective.\", \"deliverable\": \"html\", \"needs\": []}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.657710+00:00",
+              "event_type": "step_completed",
+              "payload": {
+                "step_id": 1,
+                "agent": "researcher"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.657729+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "message": "Reviewing output: {\"step_id\": 1, \"agent\": \"researcher\", \"output\": {\"summary\": \"Provide general guidance and assumptions based on the objective.\", \"deliverable\": \"html\", \"needs\": [], \"files\": [\"/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/research.md\", \"/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/handoff.json\"]}}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.657746+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "prompt": "ROLE: Critic\nReturn JSON with fields: approved, notes.\nObjective: Add an onboarding tooltip to the dashboard.\nFiles: ['/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/research.md', '/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/handoff.json']\nOutput summary: "
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.657756+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "response": "{\"approved\": true, \"notes\": \"Looks good.\"}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.657792+00:00",
+              "event_type": "critic_review",
+              "payload": {
+                "step_id": 1,
+                "approved": false
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.657795+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "message": "Starting research task: Gather context.\n\nCritic feedback: Missing primary deliverable; include a GIF/video or HTML entrypoint."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.657797+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "prompt": "ROLE: Researcher\nReturn JSON with fields: summary, deliverable, needs.\nEmphasize how to solve the objective: constraints, options, examples, risks, and decision points.\nPrefer breadth over depth; cover multiple angles beyond the prompt wording.\nAssume general implementation knowledge unless the objective explicitly requests technical research.\nObjective: Add an onboarding tooltip to the dashboard.\nTask: Gather context.\n\nCritic feedback: Missing primary deliverable; include a GIF/video or HTML entrypoint."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.657813+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "response": "{\"summary\": \"Provide general guidance and assumptions based on the objective.\", \"deliverable\": \"html\", \"needs\": []}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.660698+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "message": "Reviewing output: {\"step_id\": 1, \"agent\": \"researcher\", \"output\": {\"summary\": \"Provide general guidance and assumptions based on the objective.\", \"deliverable\": \"html\", \"needs\": [], \"files\": [\"/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/research.md\", \"/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/handoff.json\"]}}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.660715+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "prompt": "ROLE: Critic\nReturn JSON with fields: approved, notes.\nObjective: Add an onboarding tooltip to the dashboard.\nFiles: ['/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/research.md', '/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/handoff.json']\nOutput summary: "
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.660725+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "response": "{\"approved\": true, \"notes\": \"Looks good.\"}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.660761+00:00",
+              "event_type": "critic_review",
+              "payload": {
+                "step_id": 1,
+                "approved": false
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.673581+00:00",
+              "event_type": "step_started",
+              "payload": {
+                "step_id": 2,
+                "agent": "coder"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.673585+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "coder",
+                "role": "Coder",
+                "message": "Coding task: Draft a response."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.676829+00:00",
+              "event_type": "step_completed",
+              "payload": {
+                "step_id": 2,
+                "agent": "coder"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.676851+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "message": "Reviewing output: {\"step_id\": 2, \"agent\": \"coder\", \"output\": {\"artifact\": \"/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard\", \"files\": [\"index.html\", \"styles.css\", \"script.js\", \"README.md\"], \"content\": \"index.html\\nstyles.css\\nscript.js\\nREADME.md\", \"needs\": [], \"deliverable\": \"html\", \"manifest\": \"/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/artifact_manifest.json\"}}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.676874+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "prompt": "ROLE: Critic\nReturn JSON with fields: approved, notes.\nObjective: Add an onboarding tooltip to the dashboard.\nFiles: ['index.html', 'styles.css', 'script.js', 'README.md']\nOutput summary: index.html\nstyles.css\nscript.js\nREADME.md"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.676884+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "response": "{\"approved\": true, \"notes\": \"Looks good.\"}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.677072+00:00",
+              "event_type": "critic_review",
+              "payload": {
+                "step_id": 2,
+                "approved": true
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.684109+00:00",
+              "event_type": "run_completed",
+              "payload": {
+                "run_id": "feat-001",
+                "final": "researcher: {'summary': 'Provide general guidance and assumptions based on the objective.', 'deliverable': 'html', 'needs': [], 'files': ['/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/research.md', '/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/handoff.json']}\nCritic note: Missing primary deliverable; include a GIF/video or HTML entrypoint.\nindex.html\nstyles.css\nscript.js\nREADME.md"
+              }
+            }
+          ]
+        },
+        {
+          "run_id": "feat-002",
+          "objective": "Expose a status endpoint for release bundles.",
+          "final": "researcher: {'summary': 'Provide general guidance and assumptions based on the objective.', 'deliverable': 'html', 'needs': [], 'files': ['/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/research.md', '/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/handoff.json']}\nCritic note: Missing primary deliverable; include a GIF/video or HTML entrypoint.\nindex.html\nstyles.css\nscript.js\nREADME.md",
+          "output_dir": "/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles",
+          "events": [
+            {
+              "timestamp": "2026-01-21 18:29:48.644962+00:00",
+              "event_type": "run_started",
+              "payload": {
+                "run_id": "feat-002",
+                "objective": "Expose a status endpoint for release bundles."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.644984+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "planner",
+                "role": "Planner",
+                "message": "Planning for objective: Expose a status endpoint for release bundles."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.644989+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "planner",
+                "role": "Planner",
+                "prompt": "ROLE: Planner\nReturn JSON with fields: plan, deliverable, project_type, artifacts.\nplan must include steps with (id, agent, task, depends_on).\nObjective: Expose a status endpoint for release bundles."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.645063+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "planner",
+                "role": "Planner",
+                "response": "{\n  \"steps\": [\n    {\n      \"id\": 1,\n      \"agent\": \"researcher\",\n      \"task\": \"Gather relevant context for the objective.\",\n      \"depends_on\": []\n    },\n    {\n      \"id\": 2,\n      \"agent\": \"coder\",\n      \"task\": \"Draft an output artifact based on the research.\",\n      \"depends_on\": [\n        1\n      ]\n    },\n    {\n      \"id\": 3,\n      \"agent\": \"critic\",\n      \"task\": \"Review the drafted output for completeness and clarity.\",\n      \"depends_on\": [\n        2\n      ]\n    }\n  ],\n  \"seed\": 42\n}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.645153+00:00",
+              "event_type": "plan_created",
+              "payload": {
+                "run_id": "feat-002",
+                "plan": {
+                  "steps": [
+                    {
+                      "id": 1,
+                      "agent": "researcher",
+                      "task": "Gather context.",
+                      "depends_on": []
+                    },
+                    {
+                      "id": 2,
+                      "agent": "coder",
+                      "task": "Draft a response.",
+                      "depends_on": [
+                        1
+                      ]
+                    },
+                    {
+                      "id": 3,
+                      "agent": "critic",
+                      "task": "Review the draft.",
+                      "depends_on": [
+                        2
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.660775+00:00",
+              "event_type": "step_started",
+              "payload": {
+                "step_id": 1,
+                "agent": "researcher"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.660777+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "message": "Starting research task: Gather context."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.660780+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "prompt": "ROLE: Researcher\nReturn JSON with fields: summary, deliverable, needs.\nEmphasize how to solve the objective: constraints, options, examples, risks, and decision points.\nPrefer breadth over depth; cover multiple angles beyond the prompt wording.\nAssume general implementation knowledge unless the objective explicitly requests technical research.\nObjective: Expose a status endpoint for release bundles.\nTask: Gather context."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.660795+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "response": "{\"summary\": \"Provide general guidance and assumptions based on the objective.\", \"deliverable\": \"html\", \"needs\": []}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.663547+00:00",
+              "event_type": "step_completed",
+              "payload": {
+                "step_id": 1,
+                "agent": "researcher"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.663565+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "message": "Reviewing output: {\"step_id\": 1, \"agent\": \"researcher\", \"output\": {\"summary\": \"Provide general guidance and assumptions based on the objective.\", \"deliverable\": \"html\", \"needs\": [], \"files\": [\"/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/research.md\", \"/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/handoff.json\"]}}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.663580+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "prompt": "ROLE: Critic\nReturn JSON with fields: approved, notes.\nObjective: Expose a status endpoint for release bundles.\nFiles: ['/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/research.md', '/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/handoff.json']\nOutput summary: "
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.663590+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "response": "{\"approved\": true, \"notes\": \"Looks good.\"}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.663625+00:00",
+              "event_type": "critic_review",
+              "payload": {
+                "step_id": 1,
+                "approved": false
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.663628+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "message": "Starting research task: Gather context.\n\nCritic feedback: Missing primary deliverable; include a GIF/video or HTML entrypoint."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.663630+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "prompt": "ROLE: Researcher\nReturn JSON with fields: summary, deliverable, needs.\nEmphasize how to solve the objective: constraints, options, examples, risks, and decision points.\nPrefer breadth over depth; cover multiple angles beyond the prompt wording.\nAssume general implementation knowledge unless the objective explicitly requests technical research.\nObjective: Expose a status endpoint for release bundles.\nTask: Gather context.\n\nCritic feedback: Missing primary deliverable; include a GIF/video or HTML entrypoint."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.663645+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "response": "{\"summary\": \"Provide general guidance and assumptions based on the objective.\", \"deliverable\": \"html\", \"needs\": []}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.667457+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "message": "Reviewing output: {\"step_id\": 1, \"agent\": \"researcher\", \"output\": {\"summary\": \"Provide general guidance and assumptions based on the objective.\", \"deliverable\": \"html\", \"needs\": [], \"files\": [\"/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/research.md\", \"/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/handoff.json\"]}}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.667477+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "prompt": "ROLE: Critic\nReturn JSON with fields: approved, notes.\nObjective: Expose a status endpoint for release bundles.\nFiles: ['/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/research.md', '/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/handoff.json']\nOutput summary: "
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.667489+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "response": "{\"approved\": true, \"notes\": \"Looks good.\"}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.667532+00:00",
+              "event_type": "critic_review",
+              "payload": {
+                "step_id": 1,
+                "approved": false
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.677084+00:00",
+              "event_type": "step_started",
+              "payload": {
+                "step_id": 2,
+                "agent": "coder"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.677086+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "coder",
+                "role": "Coder",
+                "message": "Coding task: Draft a response."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.680392+00:00",
+              "event_type": "step_completed",
+              "payload": {
+                "step_id": 2,
+                "agent": "coder"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.680411+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "message": "Reviewing output: {\"step_id\": 2, \"agent\": \"coder\", \"output\": {\"artifact\": \"/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles\", \"files\": [\"index.html\", \"styles.css\", \"script.js\", \"README.md\"], \"content\": \"index.html\\nstyles.css\\nscript.js\\nREADME.md\", \"needs\": [], \"deliverable\": \"html\", \"manifest\": \"/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/artifact_manifest.json\"}}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.680428+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "prompt": "ROLE: Critic\nReturn JSON with fields: approved, notes.\nObjective: Expose a status endpoint for release bundles.\nFiles: ['index.html', 'styles.css', 'script.js', 'README.md']\nOutput summary: index.html\nstyles.css\nscript.js\nREADME.md"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.680437+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "response": "{\"approved\": true, \"notes\": \"Looks good.\"}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.680625+00:00",
+              "event_type": "critic_review",
+              "payload": {
+                "step_id": 2,
+                "approved": true
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.684156+00:00",
+              "event_type": "run_completed",
+              "payload": {
+                "run_id": "feat-002",
+                "final": "researcher: {'summary': 'Provide general guidance and assumptions based on the objective.', 'deliverable': 'html', 'needs': [], 'files': ['/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/research.md', '/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/handoff.json']}\nCritic note: Missing primary deliverable; include a GIF/video or HTML entrypoint.\nindex.html\nstyles.css\nscript.js\nREADME.md"
+              }
+            }
+          ]
+        },
+        {
+          "run_id": "feat-003",
+          "objective": "Add a CLI command to list recent batches.",
+          "final": "researcher: {'summary': 'Provide general guidance and assumptions based on the objective.', 'deliverable': 'html', 'needs': [], 'files': ['/home/andrew/projects/codex_swarm/output/add-a-cli-command-to-list-recent-batches/research.md', '/home/andrew/projects/codex_swarm/output/add-a-cli-command-to-list-recent-batches/handoff.json']}\nCritic note: Missing primary deliverable; include a GIF/video or HTML entrypoint.\nindex.html\nstyles.css\nscript.js\nREADME.md",
+          "output_dir": "/home/andrew/projects/codex_swarm/output/add-a-cli-command-to-list-recent-batches",
+          "events": [
+            {
+              "timestamp": "2026-01-21 18:29:48.651685+00:00",
+              "event_type": "run_started",
+              "payload": {
+                "run_id": "feat-003",
+                "objective": "Add a CLI command to list recent batches."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.651696+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "planner",
+                "role": "Planner",
+                "message": "Planning for objective: Add a CLI command to list recent batches."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.651700+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "planner",
+                "role": "Planner",
+                "prompt": "ROLE: Planner\nReturn JSON with fields: plan, deliverable, project_type, artifacts.\nplan must include steps with (id, agent, task, depends_on).\nObjective: Add a CLI command to list recent batches."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.651756+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "planner",
+                "role": "Planner",
+                "response": "{\n  \"steps\": [\n    {\n      \"id\": 1,\n      \"agent\": \"researcher\",\n      \"task\": \"Gather relevant context for the objective.\",\n      \"depends_on\": []\n    },\n    {\n      \"id\": 2,\n      \"agent\": \"coder\",\n      \"task\": \"Draft an output artifact based on the research.\",\n      \"depends_on\": [\n        1\n      ]\n    },\n    {\n      \"id\": 3,\n      \"agent\": \"critic\",\n      \"task\": \"Review the drafted output for completeness and clarity.\",\n      \"depends_on\": [\n        2\n      ]\n    }\n  ],\n  \"seed\": 42\n}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.651810+00:00",
+              "event_type": "plan_created",
+              "payload": {
+                "run_id": "feat-003",
+                "plan": {
+                  "steps": [
+                    {
+                      "id": 1,
+                      "agent": "researcher",
+                      "task": "Gather context.",
+                      "depends_on": []
+                    },
+                    {
+                      "id": 2,
+                      "agent": "coder",
+                      "task": "Draft a response.",
+                      "depends_on": [
+                        1
+                      ]
+                    },
+                    {
+                      "id": 3,
+                      "agent": "critic",
+                      "task": "Review the draft.",
+                      "depends_on": [
+                        2
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.667545+00:00",
+              "event_type": "step_started",
+              "payload": {
+                "step_id": 1,
+                "agent": "researcher"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.667548+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "message": "Starting research task: Gather context."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.667551+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "prompt": "ROLE: Researcher\nReturn JSON with fields: summary, deliverable, needs.\nEmphasize how to solve the objective: constraints, options, examples, risks, and decision points.\nPrefer breadth over depth; cover multiple angles beyond the prompt wording.\nAssume general implementation knowledge unless the objective explicitly requests technical research.\nObjective: Add a CLI command to list recent batches.\nTask: Gather context."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.667569+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "response": "{\"summary\": \"Provide general guidance and assumptions based on the objective.\", \"deliverable\": \"html\", \"needs\": []}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.670427+00:00",
+              "event_type": "step_completed",
+              "payload": {
+                "step_id": 1,
+                "agent": "researcher"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.670445+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "message": "Reviewing output: {\"step_id\": 1, \"agent\": \"researcher\", \"output\": {\"summary\": \"Provide general guidance and assumptions based on the objective.\", \"deliverable\": \"html\", \"needs\": [], \"files\": [\"/home/andrew/projects/codex_swarm/output/add-a-cli-command-to-list-recent-batches/research.md\", \"/home/andrew/projects/codex_swarm/output/add-a-cli-command-to-list-recent-batches/handoff.json\"]}}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.670459+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "prompt": "ROLE: Critic\nReturn JSON with fields: approved, notes.\nObjective: Add a CLI command to list recent batches.\nFiles: ['/home/andrew/projects/codex_swarm/output/add-a-cli-command-to-list-recent-batches/research.md', '/home/andrew/projects/codex_swarm/output/add-a-cli-command-to-list-recent-batches/handoff.json']\nOutput summary: "
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.670470+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "response": "{\"approved\": true, \"notes\": \"Looks good.\"}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.670505+00:00",
+              "event_type": "critic_review",
+              "payload": {
+                "step_id": 1,
+                "approved": false
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.670508+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "message": "Starting research task: Gather context.\n\nCritic feedback: Missing primary deliverable; include a GIF/video or HTML entrypoint."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.670511+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "prompt": "ROLE: Researcher\nReturn JSON with fields: summary, deliverable, needs.\nEmphasize how to solve the objective: constraints, options, examples, risks, and decision points.\nPrefer breadth over depth; cover multiple angles beyond the prompt wording.\nAssume general implementation knowledge unless the objective explicitly requests technical research.\nObjective: Add a CLI command to list recent batches.\nTask: Gather context.\n\nCritic feedback: Missing primary deliverable; include a GIF/video or HTML entrypoint."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.670526+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "researcher",
+                "role": "Researcher",
+                "response": "{\"summary\": \"Provide general guidance and assumptions based on the objective.\", \"deliverable\": \"html\", \"needs\": []}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.673422+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "message": "Reviewing output: {\"step_id\": 1, \"agent\": \"researcher\", \"output\": {\"summary\": \"Provide general guidance and assumptions based on the objective.\", \"deliverable\": \"html\", \"needs\": [], \"files\": [\"/home/andrew/projects/codex_swarm/output/add-a-cli-command-to-list-recent-batches/research.md\", \"/home/andrew/projects/codex_swarm/output/add-a-cli-command-to-list-recent-batches/handoff.json\"]}}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.673439+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "prompt": "ROLE: Critic\nReturn JSON with fields: approved, notes.\nObjective: Add a CLI command to list recent batches.\nFiles: ['/home/andrew/projects/codex_swarm/output/add-a-cli-command-to-list-recent-batches/research.md', '/home/andrew/projects/codex_swarm/output/add-a-cli-command-to-list-recent-batches/handoff.json']\nOutput summary: "
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.673449+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "response": "{\"approved\": true, \"notes\": \"Looks good.\"}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.673484+00:00",
+              "event_type": "critic_review",
+              "payload": {
+                "step_id": 1,
+                "approved": false
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.680636+00:00",
+              "event_type": "step_started",
+              "payload": {
+                "step_id": 2,
+                "agent": "coder"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.680639+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "coder",
+                "role": "Coder",
+                "message": "Coding task: Draft a response."
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.683847+00:00",
+              "event_type": "step_completed",
+              "payload": {
+                "step_id": 2,
+                "agent": "coder"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.683871+00:00",
+              "event_type": "agent_message",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "message": "Reviewing output: {\"step_id\": 2, \"agent\": \"coder\", \"output\": {\"artifact\": \"/home/andrew/projects/codex_swarm/output/add-a-cli-command-to-list-recent-batches\", \"files\": [\"index.html\", \"styles.css\", \"script.js\", \"README.md\"], \"content\": \"index.html\\nstyles.css\\nscript.js\\nREADME.md\", \"needs\": [], \"deliverable\": \"html\", \"manifest\": \"/home/andrew/projects/codex_swarm/output/add-a-cli-command-to-list-recent-batches/artifact_manifest.json\"}}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.683892+00:00",
+              "event_type": "llm_prompt",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "prompt": "ROLE: Critic\nReturn JSON with fields: approved, notes.\nObjective: Add a CLI command to list recent batches.\nFiles: ['index.html', 'styles.css', 'script.js', 'README.md']\nOutput summary: index.html\nstyles.css\nscript.js\nREADME.md"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.683909+00:00",
+              "event_type": "llm_response",
+              "payload": {
+                "agent": "critic",
+                "role": "Critic",
+                "response": "{\"approved\": true, \"notes\": \"Looks good.\"}"
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.684064+00:00",
+              "event_type": "critic_review",
+              "payload": {
+                "step_id": 2,
+                "approved": true
+              }
+            },
+            {
+              "timestamp": "2026-01-21 18:29:48.684181+00:00",
+              "event_type": "run_completed",
+              "payload": {
+                "run_id": "feat-003",
+                "final": "researcher: {'summary': 'Provide general guidance and assumptions based on the objective.', 'deliverable': 'html', 'needs': [], 'files': ['/home/andrew/projects/codex_swarm/output/add-a-cli-command-to-list-recent-batches/research.md', '/home/andrew/projects/codex_swarm/output/add-a-cli-command-to-list-recent-batches/handoff.json']}\nCritic note: Missing primary deliverable; include a GIF/video or HTML entrypoint.\nindex.html\nstyles.css\nscript.js\nREADME.md"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "features": {
+    "feat-001": {
+      "feature_id": "feat-001",
+      "objective": "Add an onboarding tooltip to the dashboard.",
+      "status": "completed",
+      "run_id": "feat-001",
+      "output_dir": "/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard",
+      "final": "researcher: {'summary': 'Provide general guidance and assumptions based on the objective.', 'deliverable': 'html', 'needs': [], 'files': ['/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/research.md', '/home/andrew/projects/codex_swarm/output/add-an-onboarding-tooltip-to-the-dashboard/handoff.json']}\nCritic note: Missing primary deliverable; include a GIF/video or HTML entrypoint.\nindex.html\nstyles.css\nscript.js\nREADME.md",
+      "artifacts": []
+    },
+    "feat-002": {
+      "feature_id": "feat-002",
+      "objective": "Expose a status endpoint for release bundles.",
+      "status": "completed",
+      "run_id": "feat-002",
+      "output_dir": "/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles",
+      "final": "researcher: {'summary': 'Provide general guidance and assumptions based on the objective.', 'deliverable': 'html', 'needs': [], 'files': ['/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/research.md', '/home/andrew/projects/codex_swarm/output/expose-a-status-endpoint-for-release-bundles/handoff.json']}\nCritic note: Missing primary deliverable; include a GIF/video or HTML entrypoint.\nindex.html\nstyles.css\nscript.js\nREADME.md",
+      "artifacts": []
+    },
+    "feat-003": {
+      "feature_id": "feat-003",
+      "objective": "Add a CLI command to list recent batches.",
+      "status": "completed",
+      "run_id": "feat-003",
+      "output_dir": "/home/andrew/projects/codex_swarm/output/add-a-cli-command-to-list-recent-batches",
+      "final": "researcher: {'summary': 'Provide general guidance and assumptions based on the objective.', 'deliverable': 'html', 'needs': [], 'files': ['/home/andrew/projects/codex_swarm/output/add-a-cli-command-to-list-recent-batches/research.md', '/home/andrew/projects/codex_swarm/output/add-a-cli-command-to-list-recent-batches/handoff.json']}\nCritic note: Missing primary deliverable; include a GIF/video or HTML entrypoint.\nindex.html\nstyles.css\nscript.js\nREADME.md",
+      "artifacts": []
+    }
+  }
+}
