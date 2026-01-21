@@ -16,6 +16,42 @@ python -m swarm "my objective" --run-id demo --max-steps 3 --dry-run --verbose -
 
 Outputs are written to `output/<slug>` by default (or `-o/--output-dir`) and run metadata is stored in `swarm.db`.
 
+## Programmatic multi-run
+
+Use the runner to execute multiple objectives concurrently and spawn additional runs:
+
+```python
+import asyncio
+from pathlib import Path
+
+from swarm import RunSpec, SwarmConfig, SwarmRunner
+
+config = SwarmConfig.from_repo_root(Path(".").resolve())
+runner = SwarmRunner(config=config, concurrency=2)
+
+async def main() -> None:
+    started = asyncio.Event()
+
+    async def spawn_child() -> None:
+        await started.wait()
+        runner.spawn(RunSpec(objective="follow-up task", dry_run=True))
+
+    async def run_all() -> None:
+        started.set()
+        await runner.run(
+            [
+                RunSpec(objective="draft release notes", dry_run=True),
+                RunSpec(objective="summarize docs", dry_run=True),
+            ]
+        )
+
+    async with asyncio.TaskGroup() as group:
+        group.create_task(spawn_child())
+        group.create_task(run_all())
+
+asyncio.run(main())
+```
+
 ## Using Ollama
 
 ```bash

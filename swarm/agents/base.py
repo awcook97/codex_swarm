@@ -2,13 +2,18 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Awaitable, Callable, TYPE_CHECKING
 
 from swarm.bus import EventLog
 from swarm.config import SwarmConfig
 from swarm.llm import LLM
 from swarm.memory import PersistentMemory, ShortTermMemory
 from swarm.tools import FilesystemTool, HttpTool, ShellTool
+
+if TYPE_CHECKING:
+    from swarm.runner import RunResult, RunSpec
+
+Spawner = Callable[["RunSpec"], Awaitable["RunResult"]]
 
 
 @dataclass(slots=True)
@@ -26,6 +31,7 @@ class AgentContext:
     llm: LLM
     dry_run: bool
     verbose: bool
+    spawner: Spawner | None = None
 
 
 class BaseAgent:

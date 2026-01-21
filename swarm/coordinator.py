@@ -7,7 +7,7 @@ import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Awaitable, Callable, TYPE_CHECKING
 
 from swarm.agents import (
     AgentContext,
@@ -25,6 +25,11 @@ from swarm.llm import LLM, MockLLM, OllamaLLM
 from swarm.memory import PersistentMemory, ShortTermMemory
 from swarm.tools import FilesystemTool, HttpTool, ShellTool
 
+if TYPE_CHECKING:
+    from swarm.runner import RunResult, RunSpec
+
+Spawner = Callable[["RunSpec"], Awaitable["RunResult"]]
+
 
 @dataclass(slots=True)
 class StepResult:
@@ -36,7 +41,12 @@ class StepResult:
 
 
 class Coordinator:
-    def __init__(self, config: SwarmConfig, llm: LLM | None = None) -> None:
+    def __init__(
+        self,
+        config: SwarmConfig,
+        llm: LLM | None = None,
+        spawner: Spawner | None = None,
+    ) -> None:
         self.config = config
         self.event_log = EventLog()
         self.short_term = ShortTermMemory()
@@ -45,6 +55,7 @@ class Coordinator:
         self.shell = ShellTool(list(config.shell_allowlist))
         self.http = HttpTool()
         self.llm = llm or self._build_llm()
+        self.spawner = spawner
         self.agents: dict[str, BaseAgent] = {
             "researcher": ResearcherAgent(
                 instructions=load_agent_instructions(self.config.repo_root, "researcher")
@@ -91,6 +102,7 @@ class Coordinator:
             llm=self.llm,
             dry_run=dry_run,
             verbose=verbose,
+            spawner=self.spawner,
         )
 
     async def run(
